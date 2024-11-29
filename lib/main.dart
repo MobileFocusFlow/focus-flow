@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'login.dart';
+import 'login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,14 +11,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.indigo,
-          centerTitle: true,
-          title: const Text("Focus Flow",
-              style: TextStyle(fontSize: 18, color: Colors.white)),
-        ),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
+      home: const LoginScreen(),
     );
   }
 }
