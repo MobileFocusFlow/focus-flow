@@ -12,10 +12,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.indigo.shade400,
+          backgroundColor: Colors.indigo.shade200,
           centerTitle: true,
           title: const Text("Focus Flow",
-              style: TextStyle(fontSize: 20, color: Colors.white)),
+              style: TextStyle(fontSize: 22, color: Colors.white)),
         ),
       ),
     );
