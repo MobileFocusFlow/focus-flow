@@ -10,15 +10,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.indigo,
-          centerTitle: true,
-          title: const Text("Focus Flow",
-              style: TextStyle(fontSize: 18, color: Colors.white)),
-        ),
-      ),
-    );
+    return const MaterialApp(home: Scaffold());
   }
 }
