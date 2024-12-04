@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Colors.indigo.shade200,
           centerTitle: true,
-          title: const Text("FocusFlow",
+          title: const Text("Focus123Flow",
               style: TextStyle(fontSize: 22, color: Colors.white)),
         ),
       ),
