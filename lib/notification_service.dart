@@ -1,74 +1,127 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
-import 'dart:html' as html;
-import 'dart:async';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:permission_handler/permission_handler.dart';
 
 class NotificationService {
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+  static final NotificationService _instance = NotificationService._internal();
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  NotificationService() {
-    tz.initializeTimeZones();
-    const AndroidInitializationSettings androidInitializationSettings =
-        AndroidInitializationSettings('app_icon');
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: androidInitializationSettings);
-    _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  factory NotificationService() {
+    return _instance;
   }
 
-  void scheduleNotification(String title, DateTime scheduledTime) {
-    final localTime = tz.TZDateTime.local(
-      scheduledTime.year,
-      scheduledTime.month,
-      scheduledTime.day,
-      scheduledTime.hour,
-      scheduledTime.minute,
+  NotificationService._internal();
+
+  Future<void> init() async {
+    tz.initializeTimeZones();
+
+    const AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: androidSettings,
     );
 
-    _flutterLocalNotificationsPlugin.zonedSchedule(
-      scheduledTime.hashCode,
-      'Routine Reminder',
-      'It\'s time for: $title',
-      localTime,
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'routine_channel',
-          'Routines',
-          channelDescription: 'Notifications for scheduled routines',
-        ),
-      ),
-      // ignore: deprecated_member_use
-      androidAllowWhileIdle: true,
+    await _notificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {},
+    );
+
+    await requestPermissions();
+  }
+
+  Future<void> requestPermissions() async {
+    if (Platform.isAndroid) {
+      if (int.parse(Platform.version.split('.')[0]) >= 33) {
+        await _checkPostNotificationsPermission();
+      }
+    } else if (Platform.isIOS) {
+      await _notificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+    }
+  }
+
+  Future<void> _checkPostNotificationsPermission() async {
+    if (await Permission.notification.isGranted) {
+    } else {
+      await Permission.notification.request();
+
+      if (await Permission.notification.isGranted) {
+      } else {
+        await openAppSettings();
+      }
+    }
+  }
+
+  Future<void> sendInstantNotification(String title, String content) async {
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+      'instant_channel_id',
+      'Instant Notifications',
+      channelDescription: 'This channel is for instant notifications',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+
+    const DarwinNotificationDetails iosDetails = DarwinNotificationDetails();
+
+    const NotificationDetails notificationDetails = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    await _notificationsPlugin.show(
+      0,
+      title,
+      content,
+      notificationDetails,
+    );
+  }
+
+  Future<void> sendScheduledNotification(
+      String title, String content, DateTime scheduledTime) async {
+    final tz.TZDateTime tzScheduledTime =
+        tz.TZDateTime.from(scheduledTime, tz.local);
+
+    if (tzScheduledTime.isBefore(tz.TZDateTime.now(tz.local))) {
+      return;
+    }
+
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+      'scheduled_channel_id',
+      'Scheduled Notifications',
+      channelDescription: 'This channel is for scheduled notifications',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+
+    const DarwinNotificationDetails iosDetails = DarwinNotificationDetails();
+
+    const NotificationDetails notificationDetails = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    await _notificationsPlugin.zonedSchedule(
+      0,
+      title,
+      content,
+      tzScheduledTime,
+      notificationDetails,
+      androidScheduleMode: AndroidScheduleMode.inexact,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
     );
-  }
-}
-
-void showWebNotification(String title, String body, DateTime scheduledTime) {
-  final now = DateTime.now();
-  final delay = scheduledTime.difference(now).inMilliseconds;
-
-  if (delay > 0) {
-    Timer(Duration(milliseconds: delay), () {
-      html.Notification.requestPermission().then((permission) {
-        if (permission == 'granted') {
-          html.Notification(title, body: body);
-        } else {
-          debugPrint('Permission denied for notifications.');
-        }
-      });
-    });
-  } else {
-    // If the time has already passed, show immediately
-    html.Notification.requestPermission().then((permission) {
-      if (permission == 'granted') {
-        html.Notification(title, body: body);
-      } else {
-        debugPrint('Permission denied for notifications.');
-      }
-    });
   }
 }

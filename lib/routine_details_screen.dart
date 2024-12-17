@@ -1,75 +1,74 @@
 import 'package:flutter/material.dart';
-import 'pomodoro_screen.dart';
+import 'components/routine_header.dart';
+import 'components/edit_button.dart';
+import 'components/action_button.dart';
 import 'routine_screen.dart';
 
-class RoutineDetailsScreen extends StatelessWidget {
-  final Routine routine;
+class RoutineDetailsScreen extends StatefulWidget {
+  final List<Routine> routines;
+  final Function(Routine) onRoutinesUpdated;
 
-  const RoutineDetailsScreen({super.key, required this.routine});
+  const RoutineDetailsScreen({
+    super.key,
+    required this.routines,
+    required this.onRoutinesUpdated,
+  });
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _RoutineDetailsScreenState createState() => _RoutineDetailsScreenState();
+}
+
+class _RoutineDetailsScreenState extends State<RoutineDetailsScreen> {
+  late Routine routine;
+
+  @override
+  void initState() {
+    super.initState();
+    routine = widget.routines.first;
+  }
+
+  void _handleRoutineUpdated(Routine updatedRoutine) {
+    setState(() {
+      routine = updatedRoutine;
+    });
+    widget.onRoutinesUpdated(updatedRoutine);
+  }
+
+  Color _handleBackgroundColor(bool isDarkMode) {
+    Color selectColor = Colors.redAccent;
+    if (routine.workingTechnique == "Zen") {
+      selectColor = isDarkMode ? Colors.purple : Colors.pinkAccent;
+    } else if (routine.workingTechnique == "Pomodoro") {
+      selectColor = isDarkMode ? Colors.deepOrangeAccent : Colors.orange;
+    } else if (routine.workingTechnique == "Time Blocking") {
+      selectColor = isDarkMode ? Colors.teal : Colors.blue;
+    }
+    return selectColor;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text("Routine Details"),
-        backgroundColor: Colors.deepOrangeAccent,
+        backgroundColor: _handleBackgroundColor(isDarkMode),
+        centerTitle: true,
+        elevation: 4,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
+          physics: const BouncingScrollPhysics(),
           children: [
-            // Routine title with styling
-            Text(
-              routine.title,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepOrangeAccent,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-
-            // Scheduled date and time
-            Text(
-              "Scheduled for: ${routine.dateTime.toLocal().toString().split(' ')[0]} at ${routine.dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}",
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.grey[700],
-                    fontSize: 16,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-
-            // Action button to start Pomodoro session
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PomodoroScreen(
-                          taskName: routine.title,
-                          workDuration: routine.workDuration * 60,
-                          breakDuration: routine.breakDuration * 60),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepOrangeAccent,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  elevation:
-                      5, // Adding elevation for better material design look
-                ),
-                child: const Text(
-                  "Handle with Pomodoro",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-              ),
+            RoutineHeader(routine: routine),
+            const SizedBox(height: 24),
+            ActionButton(routine: routine),
+            const SizedBox(height: 24),
+            EditButton(
+              routine: routine,
+              onRoutineUpdated: _handleRoutineUpdated,
             ),
           ],
         ),
