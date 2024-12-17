@@ -13,3 +13,13 @@ class UserDatabase {
     return _users[email] == password;
   }
 }
+ 
+ //email
+ //password
+ //user_name
+ //routines-> routine_title,
+ //           routine_technique,
+ //           routine_durations,
+ //           routine_reminder
+ //           routine_tecnique_count
+ 

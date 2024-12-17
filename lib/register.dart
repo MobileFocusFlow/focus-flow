@@ -65,10 +65,10 @@ class RegisterScreenState extends State<RegisterScreen> {
                 decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
+                  if (value == null) {
                     return 'Please enter your password';
                   }
-                  if (value.length < 6) {
+                  if (value.isEmpty) {
                     return 'Password must be at least 6 characters';
                   }
                   return null;

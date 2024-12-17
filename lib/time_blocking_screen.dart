@@ -1,35 +1,30 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'notification_service.dart';
+import 'dart:async';
 
-class PomodoroScreen extends StatefulWidget {
+class TimeBlockingScreen extends StatefulWidget {
   final String taskName;
-  final int workDuration;
-  final int breakDuration;
+  final int blockDuration;
 
-  const PomodoroScreen({
+  const TimeBlockingScreen({
     super.key,
     required this.taskName,
-    required this.workDuration,
-    required this.breakDuration,
+    required this.blockDuration,
   });
 
   @override
-  PomodoroScreenState createState() => PomodoroScreenState();
+  TimeBlockingScreenState createState() => TimeBlockingScreenState();
 }
 
-class PomodoroScreenState extends State<PomodoroScreen> {
+class TimeBlockingScreenState extends State<TimeBlockingScreen> {
   late int _timeRemaining;
-  int _pomodoroCount = 0;
   bool _isRunning = false;
-  String _currentPhase = "Work";
 
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _timeRemaining = widget.workDuration;
+    _timeRemaining = widget.blockDuration;
   }
 
   void _startTimer() {
@@ -47,7 +42,7 @@ class PomodoroScreenState extends State<PomodoroScreen> {
       } else {
         timer.cancel();
         _isRunning = false;
-        _onIntervalComplete();
+        _onBlockComplete();
       }
     });
   }
@@ -64,32 +59,25 @@ class PomodoroScreenState extends State<PomodoroScreen> {
   void _resetTimer() {
     _timer?.cancel();
     setState(() {
-      _timeRemaining = widget.workDuration;
+      _timeRemaining = widget.blockDuration;
       _isRunning = false;
-      _currentPhase = "Work";
     });
   }
 
-  void _onIntervalComplete() {
-    setState(() {
-      if (_currentPhase == "Work") {
-        _pomodoroCount++;
-        if (_pomodoroCount % 4 == 0) {
-          _currentPhase = "Long Break";
-          _timeRemaining = widget.breakDuration * 3;
-        } else {
-          _currentPhase = "Short Break";
-          _timeRemaining = widget.breakDuration;
-        }
-        NotificationService().sendInstantNotification(
-            "Time is Up", "You finished a Work session.");
-      } else {
-        _currentPhase = "Work";
-        _timeRemaining = widget.workDuration;
-        NotificationService().sendInstantNotification(
-            "Time is Up", "You finished a Break session.");
-      }
-    });
+  void _onBlockComplete() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Time Block Complete!"),
+        content: const Text("You've successfully completed this time block."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
   }
 
   String _formatTime(int seconds) {
@@ -107,13 +95,11 @@ class PomodoroScreenState extends State<PomodoroScreen> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    Color phaseColor = _currentPhase == "Work"
-        ? Colors.green
-        : (_currentPhase == "Long Break" ? Colors.blueAccent : Colors.orange);
+    Color phaseColor = Colors.deepOrangeAccent;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Pomodoro: ${widget.taskName}"),
+        title: Text("Time Blocking: ${widget.taskName}"),
         backgroundColor: phaseColor,
         centerTitle: true,
         elevation: 4,
@@ -124,13 +110,14 @@ class PomodoroScreenState extends State<PomodoroScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              _currentPhase,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              widget.taskName,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: phaseColor,
                   ),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             Text(
               _formatTime(_timeRemaining),
               style: TextStyle(
