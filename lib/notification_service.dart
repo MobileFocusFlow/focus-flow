@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class NotificationService {
@@ -28,10 +29,13 @@ class NotificationService {
 
     await _notificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {},
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        // Handle notification tap
+      },
     );
 
     await requestPermissions();
+    FirebaseMessaging.onMessage.listen(_handleFirebaseMessage);
   }
 
   Future<void> requestPermissions() async {
@@ -123,5 +127,13 @@ class NotificationService {
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
     );
+  }
+
+  void _handleFirebaseMessage(RemoteMessage message) {
+    final notification = message.notification;
+    if (notification != null) {
+      sendInstantNotification(
+          notification.title ?? 'Title', notification.body ?? 'Body');
+    }
   }
 }

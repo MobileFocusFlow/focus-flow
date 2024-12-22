@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'main.dart';
-import 'pomodoro_screen.dart';
+import 'pomodoro.dart';
 import 'time_blocking_screen.dart';
 import 'zen_screen.dart';
 
