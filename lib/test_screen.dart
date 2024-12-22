@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'notification_service.dart';
 import 'api/firebase_api.dart';
