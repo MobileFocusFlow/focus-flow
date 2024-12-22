@@ -8,6 +8,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await NotificationService().init();
+
   final firebaseApi = FirebaseApi();
   await firebaseApi.initNotifications();
 

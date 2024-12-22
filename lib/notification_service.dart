@@ -68,20 +68,15 @@ class NotificationService {
   }
 
   Future<void> sendInstantNotification(String title, String content) async {
-    const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
-      'instant_channel_id',
-      'Instant Notifications',
-      channelDescription: 'This channel is for instant notifications',
-      importance: Importance.high,
-      priority: Priority.high,
-    );
-
-    const DarwinNotificationDetails iosDetails = DarwinNotificationDetails();
-
     const NotificationDetails notificationDetails = NotificationDetails(
-      android: androidDetails,
-      iOS: iosDetails,
+      android: AndroidNotificationDetails(
+        'instant_channel_id',
+        'Instant Notifications',
+        channelDescription: 'This channel is for instant notifications',
+        importance: Importance.high,
+        priority: Priority.high,
+      ),
+      iOS: DarwinNotificationDetails(),
     );
 
     await _notificationsPlugin.show(
@@ -101,20 +96,15 @@ class NotificationService {
       return;
     }
 
-    const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
-      'scheduled_channel_id',
-      'Scheduled Notifications',
-      channelDescription: 'This channel is for scheduled notifications',
-      importance: Importance.high,
-      priority: Priority.high,
-    );
-
-    const DarwinNotificationDetails iosDetails = DarwinNotificationDetails();
-
     const NotificationDetails notificationDetails = NotificationDetails(
-      android: androidDetails,
-      iOS: iosDetails,
+      android: AndroidNotificationDetails(
+        'scheduled_channel_id',
+        'Scheduled Notifications',
+        channelDescription: 'This channel is for scheduled notifications',
+        importance: Importance.high,
+        priority: Priority.high,
+      ),
+      iOS: DarwinNotificationDetails(),
     );
 
     await _notificationsPlugin.zonedSchedule(

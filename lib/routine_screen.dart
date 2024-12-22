@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:focusflow/api/firebase_api.dart';
 import 'main.dart';
 import 'task_batching_screen.dart';
 import 'routine_creation_form.dart';
@@ -34,6 +35,14 @@ class RoutineScreenState extends State<RoutineScreen> {
 
   void _addRoutine(String title, DateTime dateTime, String workingTechnique,
       int duration, int? breakDuration) {
+    final userId = "example_user";
+    FirebaseApi().addRoutine(
+      userId,
+      title,
+      workingTechnique,
+      duration,
+      dateTime,
+    );
     final routine = Routine(
       title,
       dateTime,
