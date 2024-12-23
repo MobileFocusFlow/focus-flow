@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:focusflow/routine_screen.dart';
+import 'components/language_select.dart';
 
 class ZenScreen extends StatefulWidget {
-  final String taskName;
+  final Routine selectedRoutine;
 
   const ZenScreen({
     super.key,
-    required this.taskName,
+    required this.selectedRoutine,
   });
 
   @override
@@ -15,16 +17,15 @@ class ZenScreen extends StatefulWidget {
 }
 
 class _ZenScreenState extends State<ZenScreen> {
-  late int _timeRemaining;
-  bool _isRunning = false;
-
-  Timer? _timer;
-
   @override
   void initState() {
     super.initState();
     _timeRemaining = 0;
   }
+
+  late int _timeRemaining;
+  bool _isRunning = false;
+  Timer? _timer;
 
   void _startTimer() {
     if (_isRunning) return;
@@ -78,11 +79,12 @@ class _ZenScreenState extends State<ZenScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Zen Mode: ${widget.taskName}"),
-        backgroundColor: Colors.deepOrangeAccent,
+        title: Text("Zen Mode: ${widget.selectedRoutine.title}"),
+        backgroundColor:
+            Routine.getTechniqueColor(Routine.zenIdentifier, isDarkMode),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -90,7 +92,7 @@ class _ZenScreenState extends State<ZenScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              widget.taskName,
+              widget.selectedRoutine.title,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.deepOrangeAccent,
@@ -101,7 +103,7 @@ class _ZenScreenState extends State<ZenScreen> {
             Text(
               _formatTime(_timeRemaining),
               style: TextStyle(
-                fontSize: 48,
+                fontSize: 64,
                 fontWeight: FontWeight.bold,
                 color: isDarkMode ? Colors.white : Colors.black87,
               ),
@@ -121,7 +123,7 @@ class _ZenScreenState extends State<ZenScreen> {
                     ),
                   ),
                   icon: const Icon(Icons.play_arrow, size: 25),
-                  label: const Text("Start"),
+                  label: Text(TextsInApp.getText("start")), //"Start"
                 ),
                 ElevatedButton.icon(
                   onPressed: _isRunning ? _pauseTimer : null,
@@ -134,7 +136,7 @@ class _ZenScreenState extends State<ZenScreen> {
                     ),
                   ),
                   icon: const Icon(Icons.pause, size: 25),
-                  label: const Text("Pause"),
+                  label: Text(TextsInApp.getText("pause")), //"Pause"
                 ),
                 ElevatedButton.icon(
                   onPressed: _resetTimer,
@@ -147,7 +149,7 @@ class _ZenScreenState extends State<ZenScreen> {
                     ),
                   ),
                   icon: const Icon(Icons.replay, size: 25),
-                  label: const Text("Reset"),
+                  label: Text(TextsInApp.getText("reset")), //"Reset"
                 ),
               ],
             ),

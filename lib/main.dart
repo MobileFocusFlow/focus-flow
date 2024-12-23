@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-//import 'notification_service.dart';
 import 'login.dart';
-//import 'package:timezone/data/latest.dart' as tz;
 
 void main() async {
-  //WidgetsFlutterBinding.ensureInitialized();
-  //tz.initializeTimeZones();
-  //await NotificationService().init();
   runApp(const MyApp());
 }
 
 class ThemeNotifier {
   static final ValueNotifier<ThemeMode> themeNotifier =
       ValueNotifier(ThemeMode.light);
+}
+
+class FontSizeNotifier {
+  static final ValueNotifier<double> fontSizeNotifier =
+      ValueNotifier<double>(16.0);
 }
 
 class MyApp extends StatelessWidget {

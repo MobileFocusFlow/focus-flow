@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import '../routine_screen.dart';
+import 'language_select.dart';
 
 class EditDialog extends StatefulWidget {
   final Routine routine;
+  final double fontSize;
   final Function(Routine) onRoutineUpdated;
 
   const EditDialog({
     super.key,
     required this.routine,
+    required this.fontSize,
     required this.onRoutineUpdated,
   });
 
@@ -32,10 +35,10 @@ class _EditDialogState extends State<EditDialog> {
         TextEditingController(text: _formatDateTime(routine.dateTime));
     workDurationController =
         TextEditingController(text: routine.workDuration.toString());
+    blockDurationController =
+        TextEditingController(text: routine.workDuration.toString());
     breakDurationController =
         TextEditingController(text: routine.breakDuration.toString());
-    blockDurationController =
-        TextEditingController(text: routine.blockDuration.toString());
     selectedTechnique = routine.workingTechnique;
   }
 
@@ -52,7 +55,7 @@ class _EditDialogState extends State<EditDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      title: const Text("Edit Routine"),
+      title: Text(TextsInApp.getText("edit_routine") /*"Edit Routine"*/),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -63,13 +66,13 @@ class _EditDialogState extends State<EditDialog> {
             if (selectedTechnique == 'Pomodoro') ...[
               const SizedBox(height: 16),
               _buildDurationField(
-                "Work Duration (minutes)",
+                TextsInApp.getText("work_dur") /*"Work Duration (minutes)"*/,
                 workDurationController,
                 isWorkDuration: true,
               ),
               const SizedBox(height: 16),
               _buildDurationField(
-                "Break Duration (minutes)",
+                TextsInApp.getText("break_dur") /*"Break Duration (minutes)"*/,
                 breakDurationController,
                 isWorkDuration: false,
               ),
@@ -77,7 +80,7 @@ class _EditDialogState extends State<EditDialog> {
             if (selectedTechnique == 'Time Blocking') ...[
               const SizedBox(height: 16),
               _buildDurationField(
-                "Block Duration (minutes)",
+                TextsInApp.getText("block_dur") /*"Block Duration (minutes)"*/,
                 blockDurationController,
                 isWorkDuration: false,
               ),
@@ -88,7 +91,10 @@ class _EditDialogState extends State<EditDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text("Cancel"),
+          child: Text(
+            TextsInApp.getText("cancel"), //"Cancel"
+            style: TextStyle(fontSize: widget.fontSize),
+          ),
         ),
         ElevatedButton(
           onPressed: _saveRoutineUpdates,
@@ -97,7 +103,10 @@ class _EditDialogState extends State<EditDialog> {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
-          child: const Text("Save"),
+          child: Text(
+            TextsInApp.getText("save"), //"Save"
+            style: TextStyle(fontSize: widget.fontSize),
+          ),
         ),
       ],
     );
@@ -107,10 +116,14 @@ class _EditDialogState extends State<EditDialog> {
     return TextField(
       controller: reminderController,
       readOnly: true,
-      style: const TextStyle(fontSize: 16),
+      style: TextStyle(fontSize: widget.fontSize),
       decoration: InputDecoration(
-        labelText: "Reminder Date and Time",
-        labelStyle: const TextStyle(color: Colors.deepOrangeAccent),
+        labelText: TextsInApp.getText(
+            "edit_dialog_reminder_date_and_time") /*"Reminder Date and Time"*/,
+        labelStyle: TextStyle(
+          color: Colors.deepOrangeAccent,
+          fontSize: widget.fontSize,
+        ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         prefixIcon:
             const Icon(Icons.calendar_today, color: Colors.deepOrangeAccent),
@@ -159,7 +172,8 @@ class _EditDialogState extends State<EditDialog> {
         }
       },
       decoration: InputDecoration(
-        labelText: "Working Technique",
+        labelText:
+            TextsInApp.getText("working_technique") /*"Working Technique"*/,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       ),
       items: ['Zen', 'Pomodoro', 'Time Blocking']
@@ -176,6 +190,7 @@ class _EditDialogState extends State<EditDialog> {
   }) {
     return TextField(
       controller: controller,
+      style: TextStyle(fontSize: widget.fontSize),
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
         labelText: label,
@@ -184,18 +199,15 @@ class _EditDialogState extends State<EditDialog> {
       onChanged: (value) {
         setState(() {
           int? duration = int.tryParse(value);
-          int defaultPomodoroWorkDur = 25,
-              defaultPomodoroBreakDur = 5,
-              defaultTimeBlockingDur = 60;
 
           if (selectedTechnique == 'Pomodoro') {
             if (isWorkDuration) {
-              routine.workDuration = duration ?? defaultPomodoroWorkDur;
+              routine.workDuration = duration ?? 25;
             } else {
-              routine.breakDuration = duration ?? defaultPomodoroBreakDur;
+              routine.breakDuration = duration ?? 5;
             }
           } else if (selectedTechnique == 'Time Blocking') {
-            routine.blockDuration = duration ?? defaultTimeBlockingDur;
+            routine.workDuration = duration ?? 60;
           }
         });
       },
@@ -208,5 +220,5 @@ class _EditDialogState extends State<EditDialog> {
   }
 
   String _formatDateTime(DateTime dateTime) =>
-      "${dateTime.toLocal().toString().split(' ')[0]} at ${dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}";
+      "${dateTime.toLocal().toString().split(' ')[0]} ${TextsInApp.getText("at")} ${dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}";
 }

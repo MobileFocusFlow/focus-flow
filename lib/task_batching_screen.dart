@@ -1,500 +1,379 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
-import 'pomodoro_screen.dart';
-import 'time_blocking_screen.dart';
-import 'zen_screen.dart';
-
-class Task {
-  String name;
-  String description;
-  String technique;
-  int workDuration;
-  int breakDuration;
-  int blockDuration;
-
-  Task({
-    required this.name,
-    required this.description,
-    this.technique = '',
-    this.workDuration = 25,
-    this.breakDuration = 5,
-    this.blockDuration = 60,
-  });
-}
-
-class TaskGroup {
-  String name;
-  List<Task> tasks;
-
-  TaskGroup({required this.name, required this.tasks});
-}
+import 'package:focusflow/components/action_button.dart';
+import 'package:focusflow/components/language_select.dart';
+import 'package:focusflow/temp_user_db.dart';
+import 'routine_screen.dart';
 
 class TaskBatchingScreen extends StatefulWidget {
   const TaskBatchingScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _TaskBatchingScreenState createState() => _TaskBatchingScreenState();
+  TaskBatchingScreenState createState() => TaskBatchingScreenState();
 }
 
-class _TaskBatchingScreenState extends State<TaskBatchingScreen> {
-  final List<TaskGroup> _taskGroups = [];
+class TaskBatchingScreenState extends State<TaskBatchingScreen> {
+  late List<Routine> allRoutines;
+  late Map<String, List<Routine>> groupedRoutines;
+  late Map<String, List<Routine>> customGroups;
 
-  void _showAddOrEditTaskDialog(
-      TaskGroup group, Task? taskToEdit, bool isDarkMode) {
-    String taskName = taskToEdit?.name ?? '';
-    String taskDescription = taskToEdit?.description ?? '';
-    int workDuration = taskToEdit?.workDuration ?? 25;
-    int breakDuration = taskToEdit?.breakDuration ?? 5;
-    int blockDuration = taskToEdit?.blockDuration ?? 60;
-    String technique = taskToEdit?.technique ?? '';
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: taskToEdit == null
-                  ? const Text("Add Task", style: TextStyle(color: Colors.blue))
-                  : const Text("Edit Task",
-                      style: TextStyle(color: Colors.orange)),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      onChanged: (value) {
-                        taskName = value;
-                      },
-                      controller: TextEditingController(text: taskName),
-                      decoration: InputDecoration(
-                        labelText: "Task Name",
-                        border: OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Theme.of(context).primaryColor),
-                        ),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      onChanged: (value) {
-                        taskDescription = value;
-                      },
-                      controller: TextEditingController(text: taskDescription),
-                      decoration: InputDecoration(
-                        labelText: "Task Description",
-                        border: OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Theme.of(context).primaryColor),
-                        ),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButton<String>(
-                      value: technique.isEmpty ? null : technique,
-                      hint: const Text("Select Technique (Optional)"),
-                      items: <String>['Pomodoro', 'Time Blocking', 'Zen']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (newValue) {
-                        setState(() {
-                          technique = newValue ?? '';
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    if (technique == 'Pomodoro') ...[
-                      TextFormField(
-                        onChanged: (value) {
-                          workDuration = int.tryParse(value) ?? 25;
-                        },
-                        controller: TextEditingController(
-                            text: workDuration.toString()),
-                        decoration: InputDecoration(
-                          labelText: "Work Duration (min.)",
-                          border: OutlineInputBorder(),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.red),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
-                        ),
-                        keyboardType: TextInputType.number,
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        onChanged: (value) {
-                          breakDuration = int.tryParse(value) ?? 5;
-                        },
-                        controller: TextEditingController(
-                            text: breakDuration.toString()),
-                        decoration: InputDecoration(
-                          labelText: "Break Duration (min.)",
-                          border: OutlineInputBorder(),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.red),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
-                        ),
-                        keyboardType: TextInputType.number,
-                      ),
-                    ],
-                    if (technique == 'Time Blocking') ...[
-                      TextFormField(
-                        onChanged: (value) {
-                          blockDuration = int.tryParse(value) ?? 60;
-                        },
-                        controller: TextEditingController(
-                            text: blockDuration.toString()),
-                        decoration: InputDecoration(
-                          labelText: "Block Duration (min.)",
-                          border: OutlineInputBorder(),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.orange),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
-                        ),
-                        keyboardType: TextInputType.number,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child:
-                      const Text("Cancel", style: TextStyle(color: Colors.red)),
-                ),
-                TextButton(
-                  onPressed: () {
-                    if (taskName.isNotEmpty) {
-                      if (taskToEdit == null) {
-                        _addTaskToGroup(
-                          group,
-                          taskName,
-                          taskDescription,
-                          workDuration,
-                          breakDuration,
-                          blockDuration,
-                          technique,
-                        );
-                      } else {
-                        _editTask(
-                          group,
-                          taskToEdit,
-                          taskName,
-                          taskDescription,
-                          workDuration,
-                          breakDuration,
-                          blockDuration,
-                          technique,
-                        );
-                      }
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: taskToEdit == null
-                      ? Text("Add Task",
-                          style: TextStyle(
-                              color: isDarkMode ? Colors.orange : Colors.blue))
-                      : const Text("Save Changes",
-                          style: TextStyle(color: Colors.green)),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
+    _loadRoutines();
+    customGroups = UserDatabase.getCustomGroups();
   }
 
-  void _addTaskToGroup(
-    TaskGroup group,
-    String taskName,
-    String taskDescription,
-    int workDuration,
-    int breakDuration,
-    int blockDuration,
-    String technique,
-  ) {
+  void _loadRoutines() {
+    allRoutines = UserDatabase.getRoutines();
+    groupedRoutines = _groupRoutinesByTechnique(allRoutines);
+  }
+
+  Map<String, List<Routine>> _groupRoutinesByTechnique(List<Routine> routines) {
+    Map<String, List<Routine>> techniqueGroups = {};
+
+    for (var routine in routines) {
+      if (!techniqueGroups.containsKey(routine.workingTechnique)) {
+        techniqueGroups[routine.workingTechnique] = [];
+      }
+      techniqueGroups[routine.workingTechnique]?.add(routine);
+    }
+
+    Map<String, List<Routine>> customGroups = UserDatabase.getCustomGroups();
+
+    Set<Routine> customRoutinesSet = {};
+    customGroups.forEach((key, group) {
+      customRoutinesSet.addAll(group);
+    });
+
+    techniqueGroups.forEach((key, group) {
+      group.removeWhere((routine) => customRoutinesSet.contains(routine));
+    });
+
+    return techniqueGroups;
+  }
+
+  void _addCustomGroup(String groupName) {
     setState(() {
-      group.tasks.add(Task(
-        name: taskName,
-        description: taskDescription,
-        workDuration: workDuration,
-        breakDuration: breakDuration,
-        blockDuration: blockDuration,
-        technique: technique,
-      ));
+      UserDatabase.addCustomGroup(groupName);
+      customGroups = UserDatabase.getCustomGroups();
     });
   }
 
-  void _editTask(
-    TaskGroup group,
-    Task taskToEdit,
-    String taskName,
-    String taskDescription,
-    int workDuration,
-    int breakDuration,
-    int blockDuration,
-    String technique,
-  ) {
+  void _addRoutineToCustomGroup(String groupName, Routine routine) {
     setState(() {
-      taskToEdit.name = taskName;
-      taskToEdit.description = taskDescription;
-      taskToEdit.workDuration = workDuration;
-      taskToEdit.breakDuration = breakDuration;
-      taskToEdit.blockDuration = blockDuration;
-      taskToEdit.technique = technique;
+      UserDatabase.addRoutineToCustomGroup(groupName, routine);
+      _removeRoutineFromDefaultGroup(routine.key);
+      customGroups = UserDatabase.getCustomGroups();
     });
   }
 
-  void _showAddTaskGroupDialog() {
-    String groupName = '';
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Create Task Group",
-              style: TextStyle(color: Colors.green)),
-          content: TextFormField(
-            onChanged: (value) {
-              groupName = value;
-            },
-            decoration: const InputDecoration(labelText: "Group Name"),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text("Cancel", style: TextStyle(color: Colors.red)),
-            ),
-            TextButton(
-              onPressed: () {
-                if (groupName.isNotEmpty) {
-                  _addTaskGroup(groupName);
-                  Navigator.pop(context);
-                }
-              },
-              child: const Text("Add Group",
-                  style: TextStyle(color: Colors.green)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _addTaskGroup(String groupName) {
+  void _restoreRoutine(Routine routine) {
     setState(() {
-      _taskGroups.add(TaskGroup(name: groupName, tasks: []));
+      if (!groupedRoutines.containsKey(routine.workingTechnique)) {
+        groupedRoutines[routine.workingTechnique] = [];
+      }
+      groupedRoutines[routine.workingTechnique]?.add(routine);
     });
   }
 
-  void _deleteTaskGroup(TaskGroup group) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete Group'),
-          content: Text(
-              'Are you sure you want to delete the group "${group.name}"?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _taskGroups.remove(group);
-                });
-                Navigator.pop(context);
-              },
-              child: const Text('Yes', style: TextStyle(color: Colors.red)),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('No'),
-            ),
-          ],
-        );
-      },
-    );
+  void _removeRoutineFromCustomGroup(String groupName, String routineKey) {
+    setState(() {
+      UserDatabase.removeRoutineFromCustomGroup(groupName, routineKey);
+      customGroups = UserDatabase.getCustomGroups();
+    });
+  }
+
+  void _removeRoutineFromDefaultGroup(String routineKey) {
+    setState(() {
+      for (var routines in groupedRoutines.values) {
+        routines.removeWhere((routine) => routine.key == routineKey);
+      }
+    });
+  }
+
+  void _deleteCustomGroup(String groupName) {
+    setState(() {
+      UserDatabase.deleteCustomGroup(groupName);
+      customGroups = UserDatabase.getCustomGroups();
+    });
+  }
+
+  void _deleteRoutine(String routineKey) {
+    setState(() {
+      UserDatabase.removeRoutine(routineKey);
+      _loadRoutines();
+      for (var group in customGroups.values) {
+        group.removeWhere((routine) => routine.key == routineKey);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isDarkMode = ThemeNotifier.themeNotifier.value == ThemeMode.dark;
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Task Batching", style: TextStyle(fontSize: 24)),
-        backgroundColor: Theme.of(context).primaryColor,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            iconSize: 40,
-            onPressed: _showAddTaskGroupDialog,
+        title: const Text(
+          "Task Batching",
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
           ),
-        ],
+        ),
+        centerTitle: true,
+        backgroundColor: Routine.getTechniqueColor(
+            Routine.taskBatchingIdentifier, isDarkMode),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ListView.builder(
-          itemCount: _taskGroups.length,
-          itemBuilder: (context, index) {
-            final group = _taskGroups[index];
-
-            return Card(
-              elevation: 4, // Adding elevation to make the card raised
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ExpansionTile(
-                  backgroundColor: isDarkMode
-                      ? Colors.indigo.shade600
-                      : Colors.amber.shade600,
-                  title: Container(
-                    padding: const EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      border: Border(
-                          bottom: BorderSide(color: Colors.teal, width: 1)),
-                    ),
-                    child: Text(
-                      group.name,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.teal,
-                      ),
-                    ),
-                  ),
-                  children: [
-                    ...group.tasks.map((task) => Container(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 6, horizontal: 10),
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey, width: 1),
-                            borderRadius: BorderRadius.circular(10),
-                            color: isDarkMode
-                                ? Colors.indigo.shade800
-                                : Colors.amber.shade800,
-                          ),
-                          child: ListTile(
-                            title: Text(
-                                "${task.name} with ${task.technique.isEmpty ? "Zen" : task.technique}"),
-                            subtitle: Text(task.description),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color: Colors.red),
-                                  onPressed: () {
-                                    setState(() {
-                                      group.tasks.remove(task);
-                                    });
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.edit,
-                                      color: Colors.blue),
-                                  onPressed: () {
-                                    _showAddOrEditTaskDialog(
-                                        group, task, isDarkMode);
-                                  },
-                                ),
-                              ],
-                            ),
-                            onTap: task.technique.isEmpty
-                                ? null
-                                : () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            _buildWorkingTechniqueScreen(task),
-                                      ),
-                                    );
-                                  },
-                          ),
-                        )),
-                    Container(
-                      margin: const EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: ListTile(
-                        title: const Text("Add Task",
-                            style: TextStyle(color: Colors.blue)),
-                        leading: const Icon(Icons.add, color: Colors.blue),
-                        onTap: () {
-                          _showAddOrEditTaskDialog(group, null, isDarkMode);
-                        },
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 8.0, bottom: 8.0),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                            size: 32,
-                          ),
-                          onPressed: () {
-                            _deleteTaskGroup(group);
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                children: [
+                  _buildGroupSectionTitle("Default Technique Groups"),
+                  ..._buildDefaultGroups(),
+                  const SizedBox(height: 20),
+                  _buildGroupSectionTitle("Custom Groups"),
+                  ..._buildCustomGroups(),
+                ],
               ),
-            );
-          },
+            ),
+          ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showAddGroupDialog(),
+        icon: const Icon(Icons.group_add),
+        label: Text(
+          TextsInApp.getText("add_group") /*"Add Group"*/,
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.deepPurpleAccent,
       ),
     );
   }
 
-  Widget _buildWorkingTechniqueScreen(Task task) {
-    switch (task.technique) {
-      case 'Pomodoro':
-        return PomodoroScreen(
-          taskName: task.name,
-          workDuration: task.workDuration * 60,
-          breakDuration: task.breakDuration * 60,
+  Widget _buildGroupSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          const Icon(Icons.layers, color: Colors.deepPurpleAccent),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.deepPurpleAccent,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildDefaultGroups() {
+    return groupedRoutines.entries.map((entry) {
+      final technique = entry.key;
+      final routines = entry.value;
+
+      return _buildStylishCard(
+        title: technique,
+        subtitle:
+            "${routines.length} ${TextsInApp.getText("routines")}", // Routines
+        leadingIcon: Routine.getTechniqueIcon(technique),
+        leadingIconColor: Routine.getTechniqueColor(technique, false),
+        children: routines.map((routine) {
+          return _buildRoutineTile(routine, isDefaultGroup: true);
+        }).toList(),
+      );
+    }).toList();
+  }
+
+  List<Widget> _buildCustomGroups() {
+    return customGroups.entries.map((entry) {
+      final groupName = entry.key;
+      final routines = entry.value;
+
+      return _buildStylishCard(
+        title: groupName,
+        subtitle:
+            "${routines.length} ${TextsInApp.getText("routines")}", // Routines
+        leadingIcon: Icons.folder,
+        leadingIconColor: Colors.orange,
+        children: [
+          ...routines.map((routine) {
+            return _buildRoutineTile(routine, groupName: groupName);
+          }),
+          ListTile(
+            leading: const Icon(Icons.delete, color: Colors.red),
+            title: const Text(
+              "Delete Group",
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+            ),
+            onTap: () {
+              for (var r in UserDatabase.getCustomGroups()[groupName]!) {
+                _restoreRoutine(r);
+              }
+              _deleteCustomGroup(groupName);
+            },
+          ),
+        ],
+      );
+    }).toList();
+  }
+
+  Widget _buildStylishCard({
+    required String title,
+    required String subtitle,
+    required IconData leadingIcon,
+    required Color leadingIconColor,
+    required List<Widget> children,
+  }) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: ExpansionTile(
+        leading: CircleAvatar(
+          backgroundColor: leadingIconColor.withOpacity(0.2),
+          child: Icon(leadingIcon, color: leadingIconColor),
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        subtitle: Text(subtitle),
+        children: children,
+      ),
+    );
+  }
+
+  Widget _buildRoutineTile(Routine routine,
+      {bool isDefaultGroup = false, String? groupName}) {
+    return ListTile(
+      onTap: () {
+        UserDatabase.lastSelectedRoutine = routine;
+        ActionButton.navigateToScene(routine, context);
+      },
+      title: Text(
+        routine.title,
+        style: const TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
+      ),
+      subtitle: Text(
+        "${TextsInApp.getText("scheduled")}: ${routine.dateTime.toLocal().toString().split(' ')[0]} ${TextsInApp.getText("at")} ${routine.dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}",
+        style: const TextStyle(
+          fontSize: 14,
+          color: Colors.grey,
+        ),
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (isDefaultGroup)
+            IconButton(
+              icon: const Icon(Icons.add, color: Colors.green),
+              onPressed: () {
+                _showAddToGroupDialog(routine);
+              },
+            ),
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () {
+              if (isDefaultGroup) {
+                _deleteRoutine(routine.key);
+              } else if (groupName != null) {
+                _removeRoutineFromCustomGroup(groupName, routine.key);
+                _restoreRoutine(routine);
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddGroupDialog() {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(TextsInApp.getText("task_batching_add_custom_group")),
+          /*"Add Custom Group"*/
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: TextsInApp.getText(
+                  "task_batching_hint_group_name") /*"Enter group name"*/,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(TextsInApp.getText("cancel") /*"Cancel"*/),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final groupName = controller.text.trim();
+                if (groupName.isNotEmpty) {
+                  _addCustomGroup(groupName);
+                }
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurpleAccent,
+              ),
+              child: Text(
+                TextsInApp.getText("cancel") /*"Add"*/,
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
         );
-      case 'Time Blocking':
-        return TimeBlockingScreen(
-          taskName: task.name,
-          blockDuration: task.blockDuration * 60,
+      },
+    );
+  }
+
+  void _showAddToGroupDialog(Routine routine) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(TextsInApp.getText(
+              "task_batching_add_to_custom_group") /*"Add to Custom Group"*/),
+          content: customGroups.isEmpty
+              ? Text(TextsInApp.getText(
+                  "task_batching_no_custom_group_available") /*"No custom groups available."*/)
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: customGroups.keys.map((groupName) {
+                    return ListTile(
+                      title: Text(groupName),
+                      onTap: () {
+                        _addRoutineToCustomGroup(groupName, routine);
+                        Navigator.pop(context);
+                      },
+                    );
+                  }).toList(),
+                ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(TextsInApp.getText("cancel") /*"Cancel"*/),
+            ),
+          ],
         );
-      case 'Zen':
-        return ZenScreen(taskName: task.name);
-      default:
-        return Container();
-    }
+      },
+    );
   }
 }
