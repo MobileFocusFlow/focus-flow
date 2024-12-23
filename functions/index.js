@@ -2,11 +2,14 @@ const {onSchedule} = require("firebase-functions/v2/scheduler");
 const admin = require("firebase-admin");
 admin.initializeApp();
 
-exports.sendReminderNotifications = onSchedule("every 1 minutes", async (event) => {
+exports.sendReminderNotifications = onSchedule("every 5 minutes", async (event) => {
   const now = new Date().toISOString();
-  const routinesRef = admin.firestore().collectionGroup("userRoutines");
+  const routinesRef = admin.firestore().collectionGroup("routines");
 
-  const snapshot = await routinesRef.where("reminder", "<=", now).where("reminderSent", "==", false).get();
+  const snapshot = await routinesRef
+    .where("reminder", "<=", now)
+    .where("reminderSent", "==", false)
+    .get();
 
   for (const doc of snapshot.docs) {
     const routine = doc.data();
@@ -24,5 +27,5 @@ exports.sendReminderNotifications = onSchedule("every 1 minutes", async (event) 
     await doc.ref.update({ reminderSent: true });
   }
 
-  return null;
+  console.log("Bildirimler başarıyla gönderildi.");
 });

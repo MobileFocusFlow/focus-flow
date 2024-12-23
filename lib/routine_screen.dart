@@ -1,5 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:focusflow/api/firebase_api.dart';
 import 'main.dart';
 import 'task_batching_screen.dart';
 import 'routine_creation_form.dart';
@@ -21,6 +21,17 @@ class Routine {
     this.breakDuration,
     this.blockDuration,
   );
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'dateTime': dateTime.toIso8601String(),
+      'workingTechnique': workingTechnique,
+      'workDuration': workDuration,
+      'breakDuration': breakDuration,
+      'blockDuration': blockDuration,
+    };
+  }
 }
 
 class RoutineScreen extends StatefulWidget {
@@ -33,16 +44,10 @@ class RoutineScreen extends StatefulWidget {
 class RoutineScreenState extends State<RoutineScreen> {
   final List<Routine> _routines = [];
 
-  void _addRoutine(String title, DateTime dateTime, String workingTechnique,
-      int duration, int? breakDuration) {
-    final userId = "example_user";
-    FirebaseApi().addRoutine(
-      userId,
-      title,
-      workingTechnique,
-      duration,
-      dateTime,
-    );
+  Future<void> _addRoutine(String title, DateTime dateTime,
+      String workingTechnique, int duration, int? breakDuration) async {
+    final userId =
+        "example_user"; // Burayı Firebase Authentication ile dinamik yapabilirsiniz
     final routine = Routine(
       title,
       dateTime,
@@ -52,9 +57,19 @@ class RoutineScreenState extends State<RoutineScreen> {
       workingTechnique == "Time Blocking" ? duration : 60,
     );
 
+    // Firestore'a ekleme
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('routines')
+        .add(routine.toMap());
+
+    // State'e ekleme
     setState(() {
       _routines.add(routine);
     });
+
+    print("Rutin Firestore'a eklendi ve state güncellendi.");
   }
 
   void _updateRoutine(Routine updatedRoutine) {
