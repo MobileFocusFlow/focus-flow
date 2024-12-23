@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:focusflow/components/quote_manager.dart';
 import 'dart:async';
+import 'package:focusflow/routine_screen.dart';
+
+import 'components/language_select.dart';
+import 'temp_user_db.dart';
 
 class TimeBlockingScreen extends StatefulWidget {
-  final String taskName;
-  final int blockDuration;
+  final Routine selectedRoutine;
 
   const TimeBlockingScreen({
     super.key,
-    required this.taskName,
-    required this.blockDuration,
+    required this.selectedRoutine,
   });
 
   @override
@@ -18,13 +21,15 @@ class TimeBlockingScreen extends StatefulWidget {
 class TimeBlockingScreenState extends State<TimeBlockingScreen> {
   late int _timeRemaining;
   bool _isRunning = false;
-
+  late String _motivationalQuote;
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _timeRemaining = widget.blockDuration;
+    _timeRemaining = widget.selectedRoutine.workDuration * 60;
+    _motivationalQuote =
+        QuoteManager.getRandomQuote(TextsInApp.getLanguageCode());
   }
 
   void _startTimer() {
@@ -59,17 +64,20 @@ class TimeBlockingScreenState extends State<TimeBlockingScreen> {
   void _resetTimer() {
     _timer?.cancel();
     setState(() {
-      _timeRemaining = widget.blockDuration;
+      _timeRemaining = widget.selectedRoutine.workDuration * 60;
       _isRunning = false;
     });
   }
 
   void _onBlockComplete() {
+    UserDatabase.increaseRoutineCount(widget.selectedRoutine);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Time Block Complete!"),
-        content: const Text("You've successfully completed this time block."),
+        title: Text(
+            TextsInApp.getText("time_block_complete")), //"Time Block Complete!"
+        content: Text(TextsInApp.getText(
+            "time_block_complete_message")), //"You've successfully completed this time block."
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -78,6 +86,13 @@ class TimeBlockingScreenState extends State<TimeBlockingScreen> {
         ],
       ),
     );
+  }
+
+  void _changeQuote() {
+    setState(() {
+      _motivationalQuote =
+          QuoteManager.getRandomQuote(TextsInApp.getLanguageCode());
+    });
   }
 
   String _formatTime(int seconds) {
@@ -94,13 +109,16 @@ class TimeBlockingScreenState extends State<TimeBlockingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     Color phaseColor = Colors.deepOrangeAccent;
+    final double progress =
+        (_timeRemaining / (widget.selectedRoutine.workDuration * 60));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Time Blocking: ${widget.taskName}"),
-        backgroundColor: phaseColor,
+        title: Text("Time Blocking: ${widget.selectedRoutine.title}"),
+        backgroundColor: Routine.getTechniqueColor(
+            Routine.timeBlockingIdentifier, isDarkMode),
         centerTitle: true,
         elevation: 4,
       ),
@@ -110,8 +128,8 @@ class TimeBlockingScreenState extends State<TimeBlockingScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              widget.taskName,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              widget.selectedRoutine.title,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: phaseColor,
                   ),
@@ -121,10 +139,16 @@ class TimeBlockingScreenState extends State<TimeBlockingScreen> {
             Text(
               _formatTime(_timeRemaining),
               style: TextStyle(
-                fontSize: 72,
+                fontSize: 64,
                 fontWeight: FontWeight.bold,
                 color: isDarkMode ? Colors.white : Colors.black,
               ),
+            ),
+            const SizedBox(height: 24),
+            LinearProgressIndicator(
+              value: progress,
+              backgroundColor: Colors.grey[300],
+              valueColor: AlwaysStoppedAnimation<Color>(phaseColor),
             ),
             const SizedBox(height: 24),
             Row(
@@ -142,7 +166,8 @@ class TimeBlockingScreenState extends State<TimeBlockingScreen> {
                     elevation: 5,
                   ),
                   icon: const Icon(Icons.play_arrow, size: 25),
-                  label: const Text("Start", style: TextStyle(fontSize: 16)),
+                  label: Text(TextsInApp.getText("start") /*"Start"*/,
+                      style: TextStyle(fontSize: 16)),
                 ),
                 ElevatedButton.icon(
                   onPressed: _isRunning ? _pauseTimer : null,
@@ -156,7 +181,8 @@ class TimeBlockingScreenState extends State<TimeBlockingScreen> {
                     elevation: 5,
                   ),
                   icon: const Icon(Icons.pause, size: 25),
-                  label: const Text("Pause", style: TextStyle(fontSize: 16)),
+                  label: Text(TextsInApp.getText("pause") /*"Pause"*/,
+                      style: TextStyle(fontSize: 16)),
                 ),
                 ElevatedButton.icon(
                   onPressed: _resetTimer,
@@ -170,10 +196,13 @@ class TimeBlockingScreenState extends State<TimeBlockingScreen> {
                     elevation: 5,
                   ),
                   icon: const Icon(Icons.replay, size: 25),
-                  label: const Text("Reset", style: TextStyle(fontSize: 16)),
+                  label: Text(TextsInApp.getText("reset") /*"Reset"*/,
+                      style: TextStyle(fontSize: 16)),
                 ),
               ],
             ),
+            QuoteManager.addQuoteContainer(
+                _motivationalQuote, context, _changeQuote),
           ],
         ),
       ),

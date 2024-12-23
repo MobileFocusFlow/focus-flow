@@ -1,17 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'notification_service.dart';
+import 'package:focusflow/components/language_select.dart';
+import 'package:focusflow/temp_user_db.dart';
+import 'package:focusflow/components/quote_manager.dart'; // Added for quotes
+import 'routine_screen.dart';
 
 class PomodoroScreen extends StatefulWidget {
-  final String taskName;
-  final int workDuration;
-  final int breakDuration;
+  final Routine selectedRoutine;
 
   const PomodoroScreen({
     super.key,
-    required this.taskName,
-    required this.workDuration,
-    required this.breakDuration,
+    required this.selectedRoutine,
   });
 
   @override
@@ -23,13 +22,18 @@ class PomodoroScreenState extends State<PomodoroScreen> {
   int _pomodoroCount = 0;
   bool _isRunning = false;
   String _currentPhase = "Work";
-
+  late String _motivationalQuote;
   Timer? _timer;
+
+  int get _workDuration => widget.selectedRoutine.workDuration * 60;
+  int get _breakDuration => widget.selectedRoutine.breakDuration * 60;
 
   @override
   void initState() {
     super.initState();
-    _timeRemaining = widget.workDuration;
+    _timeRemaining = _workDuration;
+    _motivationalQuote = QuoteManager.getRandomQuote(
+        TextsInApp.getLanguageCode()); // Added for quotes
   }
 
   void _startTimer() {
@@ -64,7 +68,7 @@ class PomodoroScreenState extends State<PomodoroScreen> {
   void _resetTimer() {
     _timer?.cancel();
     setState(() {
-      _timeRemaining = widget.workDuration;
+      _timeRemaining = _workDuration;
       _isRunning = false;
       _currentPhase = "Work";
     });
@@ -76,20 +80,47 @@ class PomodoroScreenState extends State<PomodoroScreen> {
         _pomodoroCount++;
         if (_pomodoroCount % 4 == 0) {
           _currentPhase = "Long Break";
-          _timeRemaining = widget.breakDuration * 3;
+          _timeRemaining = _breakDuration * 3;
+          _onBlockComplete();
         } else {
           _currentPhase = "Short Break";
-          _timeRemaining = widget.breakDuration;
+          _timeRemaining = _breakDuration;
         }
-        NotificationService().sendInstantNotification(
-            "Time is Up", "You finished a Work session.");
       } else {
         _currentPhase = "Work";
-        _timeRemaining = widget.workDuration;
-        NotificationService().sendInstantNotification(
-            "Time is Up", "You finished a Break session.");
+        _timeRemaining = _workDuration;
       }
+      _motivationalQuote =
+          QuoteManager.getRandomQuote(TextsInApp.getLanguageCode());
     });
+  }
+
+  void _onBlockComplete() {
+    UserDatabase.increaseRoutineCount(widget.selectedRoutine);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(TextsInApp.getText("pomodoro_complete")),
+        content: Text(TextsInApp.getText("pomodoro_complete_message")),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _changeQuote() {
+    setState(() {
+      _motivationalQuote =
+          QuoteManager.getRandomQuote(TextsInApp.getLanguageCode());
+    });
+  }
+
+  double _computeProgress(int duration) {
+    return _timeRemaining / duration;
   }
 
   String _formatTime(int seconds) {
@@ -110,11 +141,16 @@ class PomodoroScreenState extends State<PomodoroScreen> {
     Color phaseColor = _currentPhase == "Work"
         ? Colors.green
         : (_currentPhase == "Long Break" ? Colors.blueAccent : Colors.orange);
+    final double workProgress =
+        _currentPhase == "Work" ? _computeProgress(_workDuration) : 0;
+    final double breakProgress =
+        _currentPhase != "Work" ? _computeProgress(_breakDuration) : 1;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Pomodoro: ${widget.taskName}"),
-        backgroundColor: phaseColor,
+        title: Text("Pomodoro: ${widget.selectedRoutine.title}"),
+        backgroundColor:
+            Routine.getTechniqueColor(Routine.pomodoroIdentifier, isDarkMode),
         centerTitle: true,
         elevation: 4,
       ),
@@ -130,14 +166,37 @@ class PomodoroScreenState extends State<PomodoroScreen> {
                     color: phaseColor,
                   ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             Text(
               _formatTime(_timeRemaining),
               style: TextStyle(
-                fontSize: 72,
+                fontSize: 64,
                 fontWeight: FontWeight.bold,
                 color: isDarkMode ? Colors.white : Colors.black,
               ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: LinearProgressIndicator(
+                    value: breakProgress,
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        _currentPhase == "Long Break"
+                            ? Colors.blueAccent
+                            : Colors.orange),
+                  ),
+                ),
+                const SizedBox(width: 1),
+                Expanded(
+                  child: LinearProgressIndicator(
+                    value: workProgress,
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 24),
             Row(
@@ -155,7 +214,8 @@ class PomodoroScreenState extends State<PomodoroScreen> {
                     elevation: 5,
                   ),
                   icon: const Icon(Icons.play_arrow, size: 25),
-                  label: const Text("Start", style: TextStyle(fontSize: 16)),
+                  label: Text(TextsInApp.getText("start"),
+                      style: TextStyle(fontSize: 16)),
                 ),
                 ElevatedButton.icon(
                   onPressed: _isRunning ? _pauseTimer : null,
@@ -169,7 +229,8 @@ class PomodoroScreenState extends State<PomodoroScreen> {
                     elevation: 5,
                   ),
                   icon: const Icon(Icons.pause, size: 25),
-                  label: const Text("Pause", style: TextStyle(fontSize: 16)),
+                  label: Text(TextsInApp.getText("pause"),
+                      style: TextStyle(fontSize: 16)),
                 ),
                 ElevatedButton.icon(
                   onPressed: _resetTimer,
@@ -183,10 +244,13 @@ class PomodoroScreenState extends State<PomodoroScreen> {
                     elevation: 5,
                   ),
                   icon: const Icon(Icons.replay, size: 25),
-                  label: const Text("Reset", style: TextStyle(fontSize: 16)),
+                  label: Text(TextsInApp.getText("reset"),
+                      style: TextStyle(fontSize: 16)),
                 ),
               ],
             ),
+            QuoteManager.addQuoteContainer(
+                _motivationalQuote, context, _changeQuote),
           ],
         ),
       ),

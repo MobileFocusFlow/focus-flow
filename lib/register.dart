@@ -15,10 +15,14 @@ class RegisterScreenState extends State<RegisterScreen> {
 
   void register() {
     if (_formKey.currentState!.validate()) {
-      String email = _emailController.text.trim();
-      String password = _passwordController.text.trim();
+      UserDatabase.users[UserDatabase.emailIdentifier] =
+          _emailController.text.trim();
+      UserDatabase.users[UserDatabase.passwordIdentifier] =
+          _passwordController.text.trim();
 
-      if (UserDatabase.register(email, password)) {
+      if (UserDatabase.register(
+          UserDatabase.users[UserDatabase.emailIdentifier]!,
+          UserDatabase.users[UserDatabase.passwordIdentifier]!)) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Registration Successful')),
         );

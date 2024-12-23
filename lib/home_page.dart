@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:animate_do/animate_do.dart';
+import 'package:focusflow/components/language_select.dart';
+import 'main.dart';
 import 'routine_screen.dart';
-import 'options.dart'; // Ensure OptionsScreen is properly defined and imported
-import 'main.dart'; // Importing main.dart to access the ThemeNotifier
+import 'settings.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,103 +13,145 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  void _updateLanguage(String language) {
+    setState(() {
+      TextsInApp.setSelectedLanguage(language);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Accessing ThemeNotifier to check if the dark mode is active
-    bool isDarkMode = ThemeNotifier.themeNotifier.value == ThemeMode.dark;
-
+    final isDarkMode = ThemeNotifier.themeNotifier.value == ThemeMode.dark;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Home Page"),
-        backgroundColor: Colors.deepOrangeAccent,
-        elevation: 4,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Welcome to the Routine App',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.orangeAccent,
-                    ),
-              ),
-              const SizedBox(height: 40),
-              Container(
-                margin: const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const RoutineScreen(),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade300,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 14, horizontal: 40),
-                    textStyle: const TextStyle(fontSize: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 5,
-                  ),
-                  child: const Text(
-                    'Go to Routine Screen',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.all(10),
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const OptionsScreen(),
-                      ),
-                    );
-                  },
-                  label: const Text("Settings",
-                      style: TextStyle(color: Colors.white)),
-                  icon: const Icon(Icons.settings),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade300,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 14, horizontal: 40),
-                    textStyle: const TextStyle(fontSize: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 5,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Start managing your time effectively!',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: isDarkMode
-                          ? Colors.grey.shade400
-                          : Colors.grey.shade800,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDarkMode
+                ? [Colors.black87, Colors.black54, Colors.black45]
+                : [
+                    Colors.orange.shade100,
+                    Colors.orange.shade300,
+                    Colors.orange.shade400
+                  ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
+        ),
+        child: ValueListenableBuilder<double>(
+          valueListenable: FontSizeNotifier.fontSizeNotifier,
+          builder: (context, fontSize, child) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Title with Animation
+                  FadeInDown(
+                    duration: const Duration(milliseconds: 800),
+                    child: Text(
+                      TextsInApp.getText(
+                          "home_page_welcome"), //'Welcome to the Routine App',
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color:
+                            isDarkMode ? Colors.white : Colors.orange.shade800,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 50),
+
+                  // Routine Screen Button
+                  FadeInUp(
+                    duration: const Duration(milliseconds: 1000),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RoutineScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepOrange.shade400,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 18, horizontal: 40),
+                        textStyle: TextStyle(fontSize: fontSize),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 6,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.list, size: 24, color: Colors.white),
+                          SizedBox(width: 10),
+                          Text(
+                              TextsInApp.getText(
+                                  "home_page_goto_routine_screen"),
+                              style: TextStyle(color: Colors.white)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+
+                  // Settings Screen Button
+                  FadeInUp(
+                    duration: const Duration(milliseconds: 1000),
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SettingsScreen(
+                              updateLanguageCallback: _updateLanguage,
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.settings, size: 24),
+                      label: Text(
+                        TextsInApp.getText("home_page_settings"),
+                        style:
+                            TextStyle(color: Colors.white, fontSize: fontSize),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepOrange.shade400,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 18, horizontal: 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 6,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
