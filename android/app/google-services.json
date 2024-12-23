@@ -12,7 +12,12 @@
           "package_name": "com.example.focusflow"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "98744907501-eidbtcvrova1guokdr7d6i8il2btd07b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCavgy81wOIxnVCYvHYJnEOyacJi4jODCM"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "98744907501-eidbtcvrova1guokdr7d6i8il2btd07b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
