@@ -14,11 +14,17 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool isDarkMode = ThemeNotifier.themeNotifier.value == ThemeMode.dark;
 
+  void _updateLanguage(String language) {
+    setState(() {
+      TextsInApp.setSelectedLanguage(language);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: Text(TextsInApp.getText("routine_screen_settings")), //'Settings'
         backgroundColor: Colors.deepPurpleAccent,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -37,8 +43,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
               leading:
                   const Icon(Icons.dark_mode, color: Colors.deepPurpleAccent),
-              title: const Text(
-                'Dark Mode',
+              title: Text(
+                TextsInApp.getText("dark_mode"), //'Dark Mode'
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -58,7 +64,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const Divider(),
             // Language Option
-            LanguageSelectionWidget(),
+            LanguageSelectionWidget(
+              onLanguageUpdated: _updateLanguage,
+            ),
             const Divider(),
 
             // Font Size Option
@@ -69,8 +77,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
                   leading: const Icon(Icons.text_fields,
                       color: Colors.deepPurpleAccent),
-                  title: const Text(
-                    'Font Size',
+                  title: Text(
+                    TextsInApp.getText("font_size"), //'Font Size'
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -78,8 +86,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   subtitle: Text(
-                    'Current: ${fontSize.toInt()}',
-                    style: TextStyle(fontSize: 16.0),
+                    "${TextsInApp.getText("current")}: ${fontSize.toInt()}",
+                    style: TextStyle(fontSize: 15.0),
                   ),
                   trailing: IconButton(
                     icon:
@@ -93,7 +101,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             builder: (context, setDialogState) {
                               return AlertDialog(
                                 alignment: Alignment.center,
-                                title: const Text('Adjust Font Size'),
+                                title: Text(TextsInApp.getText(
+                                    "settings_adjust_font_size")),
                                 content: SizedBox(
                                   width: 300,
                                   height: 120,
@@ -103,8 +112,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     children: [
                                       Slider(
                                         value: tempFontSize,
-                                        min: 10.0,
-                                        max: 20.0,
+                                        min: 9.0,
+                                        max: 19.0,
                                         divisions: 10,
                                         label: tempFontSize.toInt().toString(),
                                         onChanged: (value) {
@@ -121,7 +130,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     onPressed: () {
                                       Navigator.pop(context);
                                     },
-                                    child: const Text('Cancel'),
+                                    child: Text(TextsInApp.getText(
+                                        "cancel")), //'Cancel'
                                   ),
                                   TextButton(
                                     onPressed: () {
@@ -129,7 +139,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           tempFontSize;
                                       Navigator.pop(context);
                                     },
-                                    child: const Text('Save'),
+                                    child: Text(
+                                        TextsInApp.getText("save")), //'Save'
                                   ),
                                 ],
                               );

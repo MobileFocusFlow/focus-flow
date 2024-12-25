@@ -113,8 +113,9 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Task Batching",
+        title: Text(
+          TextsInApp.getTechniqueNameWithLanguage(
+              Routine.taskBatchingIdentifier),
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -132,10 +133,12 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
             Expanded(
               child: ListView(
                 children: [
-                  _buildGroupSectionTitle("Default Technique Groups"),
+                  _buildGroupSectionTitle(TextsInApp.getText(
+                      "technique_groups")), //"Technique Groups"
                   ..._buildDefaultGroups(),
                   const SizedBox(height: 20),
-                  _buildGroupSectionTitle("Custom Groups"),
+                  _buildGroupSectionTitle(
+                      TextsInApp.getText("custom_groups")), //"Custom Groups"
                   ..._buildCustomGroups(),
                 ],
               ),
@@ -210,8 +213,8 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
           }),
           ListTile(
             leading: const Icon(Icons.delete, color: Colors.red),
-            title: const Text(
-              "Delete Group",
+            title: Text(
+              TextsInApp.getText("delete_group"), //"Delete Group",
               style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
             ),
             onTap: () {
@@ -280,7 +283,8 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
         children: [
           if (isDefaultGroup)
             IconButton(
-              icon: const Icon(Icons.add, color: Colors.green),
+              icon: const Icon(Icons.arrow_forward,
+                  color: Colors.green, size: 30),
               onPressed: () {
                 _showAddToGroupDialog(routine);
               },
@@ -334,7 +338,7 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
                 backgroundColor: Colors.deepPurpleAccent,
               ),
               child: Text(
-                TextsInApp.getText("cancel") /*"Add"*/,
+                TextsInApp.getText("add") /*"Add"*/,
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -358,7 +362,11 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: customGroups.keys.map((groupName) {
                     return ListTile(
+                      style: ListTileStyle.list,
                       title: Text(groupName),
+                      /*tileColor: isDarkMode
+                          ? Colors.deepPurple.shade900
+                          : Colors.deepOrange.shade600,*/
                       onTap: () {
                         _addRoutineToCustomGroup(groupName, routine);
                         Navigator.pop(context);

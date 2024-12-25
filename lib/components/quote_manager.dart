@@ -53,26 +53,38 @@ class QuoteManager {
     return _quotes[key]!.first;
   }
 
-  static Column addQuoteContainer(motivationalQuote, context, changeQuote) {
-    return Column(children: [
-      const SizedBox(height: 200),
-      Text(
-        '"$motivationalQuote"',
-        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              fontStyle: FontStyle.italic,
-              color: Colors.grey,
-              fontSize: 15,
+  static Stack addQuoteContainer(motivationalQuote, context, changeQuote) {
+    return Stack(
+      children: [
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '"$motivationalQuote"',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontStyle: FontStyle.italic,
+                        color: Colors.grey,
+                        fontSize: 16,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 14),
+                ElevatedButton(
+                  onPressed: changeQuote,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                  ),
+                  child: const Icon(Icons.arrow_forward),
+                ),
+              ],
             ),
-        textAlign: TextAlign.center,
-      ),
-      const SizedBox(height: 15),
-      ElevatedButton(
-        onPressed: changeQuote,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blueAccent,
+          ),
         ),
-        child: const Icon(Icons.arrow_forward),
-      ),
-    ]);
+      ],
+    );
   }
 }

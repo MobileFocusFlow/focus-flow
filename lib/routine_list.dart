@@ -55,7 +55,8 @@ class _RoutineListState extends State<RoutineList> {
                               Routine.timeBlockingIdentifier, isDarkMode)),
                       const SizedBox(width: 10),
                       Text(
-                        Routine.timeBlockingIdentifier,
+                        TextsInApp.getTechniqueNameWithLanguage(
+                            Routine.timeBlockingIdentifier),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: fontSize,
@@ -66,10 +67,10 @@ class _RoutineListState extends State<RoutineList> {
                   children: timeBlockingRoutines.map((routine) {
                     return Card(
                       margin: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 4),
+                          horizontal: 12, vertical: 2),
                       elevation: 2,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: ListTile(
                         leading: Icon(Icons.access_time,
@@ -86,7 +87,7 @@ class _RoutineListState extends State<RoutineList> {
                           //"Scheduled: ${routine.dateTime.toLocal().toString().split(' ')[0]} at ${routine.dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}"
                           "${TextsInApp.getText("scheduled")} ${routine.dateTime.toLocal().toString().split(' ')[0]} ${TextsInApp.getText("at")} ${routine.dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}",
                           style: TextStyle(
-                            fontSize: fontSize - 1,
+                            fontSize: fontSize - 2,
                             color: Colors.grey,
                           ),
                         ),
@@ -131,9 +132,10 @@ class _RoutineListState extends State<RoutineList> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  elevation: 8,
+                  elevation: 4,
                   child: SizedBox(
-                    width: 425,
+                    height: 80,
+                    width: 450,
                     child: ListTile(
                       leading: Icon(
                         Routine.getTechniqueIcon(routine.workingTechnique),
@@ -149,7 +151,7 @@ class _RoutineListState extends State<RoutineList> {
                       subtitle: Text(
                         "${TextsInApp.getText("scheduled")} ${routine.dateTime.toLocal().toString().split(' ')[0]} ${TextsInApp.getText("at")} ${routine.dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}",
                         style: TextStyle(
-                          fontSize: fontSize - 2,
+                          fontSize: fontSize - 3,
                           color: Colors.grey,
                         ),
                       ),
@@ -159,6 +161,10 @@ class _RoutineListState extends State<RoutineList> {
                           _showDeleteDialog(context, key);
                         },
                       ),
+                      style: ListTileStyle.list,
+                      /*tileColor: isDarkMode
+                          ? Colors.deepPurple.shade900
+                          : Colors.deepOrange.shade600,*/
                       onTap: () {
                         UserDatabase.lastSelectedRoutine = routine;
                         Navigator.push(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:focusflow/components/quote_manager.dart';
 import 'dart:async';
 import 'package:focusflow/routine_screen.dart';
-
+import 'components/action_button.dart';
 import 'components/language_select.dart';
 import 'temp_user_db.dart';
 
@@ -70,22 +70,7 @@ class TimeBlockingScreenState extends State<TimeBlockingScreen> {
   }
 
   void _onBlockComplete() {
-    UserDatabase.increaseRoutineCount(widget.selectedRoutine);
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-            TextsInApp.getText("time_block_complete")), //"Time Block Complete!"
-        content: Text(TextsInApp.getText(
-            "time_block_complete_message")), //"You've successfully completed this time block."
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text("OK"),
-          ),
-        ],
-      ),
-    );
+    _showDeleteDialog(context, UserDatabase.lastSelectedRoutine.key);
   }
 
   void _changeQuote() {
@@ -110,101 +95,101 @@ class TimeBlockingScreenState extends State<TimeBlockingScreen> {
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    Color phaseColor = Colors.deepOrangeAccent;
     final double progress =
         (_timeRemaining / (widget.selectedRoutine.workDuration * 60));
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Time Blocking: ${widget.selectedRoutine.title}"),
-        backgroundColor: Routine.getTechniqueColor(
-            Routine.timeBlockingIdentifier, isDarkMode),
-        centerTitle: true,
-        elevation: 4,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              widget.selectedRoutine.title,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: phaseColor,
+      appBar: AppDecorations.getTechniqueAppBar(widget.selectedRoutine.title,
+          isDarkMode, Routine.timeBlockingIdentifier),
+      body: Stack(
+        children: [
+          Align(
+            alignment: Alignment.center,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    widget.selectedRoutine.title,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Routine.getTechniqueColor(
+                              Routine.timeBlockingIdentifier, isDarkMode),
+                        ),
                   ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              _formatTime(_timeRemaining),
-              style: TextStyle(
-                fontSize: 64,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black,
+                  const SizedBox(height: 24),
+                  Text(
+                    _formatTime(_timeRemaining),
+                    style: TextStyle(
+                      fontSize: 64,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  LinearProgressIndicator(
+                    value: progress,
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        Routine.getTechniqueColor(
+                            Routine.timeBlockingIdentifier, isDarkMode)),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      AppDecorations.getStartButtonForTimer(
+                          _isRunning, _startTimer),
+                      AppDecorations.getPauseButtonForTimer(
+                          _isRunning, _pauseTimer),
+                      AppDecorations.getResetButtonForTimer(_resetTimer),
+                    ],
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 24),
-            LinearProgressIndicator(
-              value: progress,
-              backgroundColor: Colors.grey[300],
-              valueColor: AlwaysStoppedAnimation<Color>(phaseColor),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0)
+                  .copyWith(bottom: 16.0),
+              child: QuoteManager.addQuoteContainer(
+                  _motivationalQuote, context, _changeQuote),
             ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _isRunning ? null : _startTimer,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    elevation: 5,
-                  ),
-                  icon: const Icon(Icons.play_arrow, size: 25),
-                  label: Text(TextsInApp.getText("start") /*"Start"*/,
-                      style: TextStyle(fontSize: 16)),
-                ),
-                ElevatedButton.icon(
-                  onPressed: _isRunning ? _pauseTimer : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    elevation: 5,
-                  ),
-                  icon: const Icon(Icons.pause, size: 25),
-                  label: Text(TextsInApp.getText("pause") /*"Pause"*/,
-                      style: TextStyle(fontSize: 16)),
-                ),
-                ElevatedButton.icon(
-                  onPressed: _resetTimer,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    elevation: 5,
-                  ),
-                  icon: const Icon(Icons.replay, size: 25),
-                  label: Text(TextsInApp.getText("reset") /*"Reset"*/,
-                      style: TextStyle(fontSize: 16)),
-                ),
-              ],
-            ),
-            QuoteManager.addQuoteContainer(
-                _motivationalQuote, context, _changeQuote),
-          ],
-        ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context, String key) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(TextsInApp.getText(
+            "routine_list_delete_routine") /*'Delete Routine'*/),
+        content: Text(TextsInApp.getText(
+            "time_blocking_delete_routine_confirm") /*'You completed this time block. Do you want to delete this routine?'*/),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(TextsInApp.getText("cancel") /*'Cancel'*/),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                UserDatabase.removeRoutine(key);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RoutineScreen()),
+                );
+              });
+            },
+            child: Text(TextsInApp.getText("delete") /*'Delete'*/),
+          ),
+        ],
       ),
     );
   }

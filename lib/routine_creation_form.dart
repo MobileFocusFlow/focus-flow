@@ -6,7 +6,8 @@ import 'routine_screen.dart';
 
 class RoutineCreationForm extends StatefulWidget {
   final String workingTechnique;
-  final Function(String, String, DateTime, String, int, int?, int, String, int)
+  final Function(
+          String, String, DateTime, String, int, int?, String, int, int, int)
       onRoutineCreated;
 
   const RoutineCreationForm({
@@ -26,9 +27,10 @@ class _RoutineCreationFormState extends State<RoutineCreationForm> {
   TimeOfDay? _selectedTime;
   int _workDuration = 0;
   int _breakDuration = 0;
-  final int _routineCount = 0;
   final String _postItNote = "";
   final int _priority = 0;
+  final int _isImportant = -1;
+  final int _isUrgent = -1;
 
   final _workDurationController = TextEditingController();
   final _breakDurationController = TextEditingController();
@@ -256,29 +258,29 @@ class _RoutineCreationFormState extends State<RoutineCreationForm> {
           widget.workingTechnique;
 
       widget.onRoutineCreated(
-        routineKey,
-        _titleController.text,
-        combinedDateTime,
-        widget.workingTechnique,
-        _workDuration,
-        _breakDuration,
-        _routineCount,
-        _postItNote,
-        _priority,
-      );
-
-      setState(() {
-        Routine newRoutine = Routine(
           routineKey,
           _titleController.text,
           combinedDateTime,
           widget.workingTechnique,
           _workDuration,
           _breakDuration,
-          _routineCount,
           _postItNote,
           _priority,
-        );
+          _isImportant,
+          _isUrgent);
+
+      setState(() {
+        Routine newRoutine = Routine(
+            routineKey,
+            _titleController.text,
+            combinedDateTime,
+            widget.workingTechnique,
+            _workDuration,
+            _breakDuration,
+            _postItNote,
+            _priority,
+            _isImportant,
+            _isUrgent);
         UserDatabase.addRoutine(newRoutine);
       });
 

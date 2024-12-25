@@ -69,7 +69,7 @@ class _RoutineDetailsScreenState extends State<RoutineDetailsScreen> {
           appBar: AppBar(
             title: Text(
               TextsInApp.getText("routine_details_routine_details"),
-              style: TextStyle(fontSize: fontSize + 2),
+              style: TextStyle(fontSize: fontSize + 8),
             ),
             backgroundColor: _handleBackgroundColor(isDarkMode),
             centerTitle: true,
@@ -108,7 +108,7 @@ class _RoutineDetailsScreenState extends State<RoutineDetailsScreen> {
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: _getGradient(isDarkMode),
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(12),
       ),
       padding: const EdgeInsets.all(16.0),
       margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -142,10 +142,11 @@ class _RoutineDetailsScreenState extends State<RoutineDetailsScreen> {
       padding: const EdgeInsets.all(16.0),
       child: Container(
         width: double.infinity,
+        height: 285,
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
           gradient: _getGradient(isDarkMode),
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
               color: Colors.black26,
@@ -164,7 +165,11 @@ class _RoutineDetailsScreenState extends State<RoutineDetailsScreen> {
   LinearGradient _getGradient(bool isDarkMode) {
     return LinearGradient(
       colors: isDarkMode
-          ? [Colors.grey.shade900, Colors.black54, Colors.grey.shade900]
+          ? [
+              Colors.grey.shade900,
+              Colors.deepPurple.shade900,
+              Colors.grey.shade900
+            ]
           : [Colors.blue.shade100, Colors.blue.shade200, Colors.blue.shade300],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,

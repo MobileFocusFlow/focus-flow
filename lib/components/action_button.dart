@@ -5,6 +5,82 @@ import '../time_blocking_screen.dart';
 import '../routine_screen.dart';
 import 'language_select.dart';
 
+class AppDecorations {
+  static AppBar getTechniqueAppBar(
+      String title, bool isDarkMode, String workingTechnique) {
+    String identifier = "";
+    if (workingTechnique.toLowerCase().contains("pomodoro")) {
+      identifier = Routine.pomodoroIdentifier;
+    } else if (workingTechnique.toLowerCase().contains("zen")) {
+      identifier = Routine.zenIdentifier;
+    } else if (workingTechnique.toLowerCase().contains("time blocking")) {
+      identifier = Routine.timeBlockingIdentifier;
+    } else if (workingTechnique.toLowerCase().contains("task batching")) {
+      identifier = Routine.taskBatchingIdentifier;
+    } else if (workingTechnique.toLowerCase().contains("eisenhower")) {
+      identifier = Routine.eisenhowerIdentifier;
+    } else if (workingTechnique.toLowerCase().contains("eat that frog")) {
+      identifier = Routine.eatThatFrogIdentifier;
+    }
+    return AppBar(
+        title: Text(
+          "${TextsInApp.getTechniqueNameWithLanguage(identifier)}: $title",
+          style: TextStyle(fontSize: 22),
+        ),
+        backgroundColor: Routine.getTechniqueColor(identifier, isDarkMode),
+        centerTitle: true,
+        elevation: 4);
+  }
+
+  static ElevatedButton getStartButtonForTimer(bool isRunning, startTimer) {
+    return ElevatedButton.icon(
+      onPressed: isRunning ? null : startTimer,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.green,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        elevation: 5,
+      ),
+      icon: const Icon(Icons.play_arrow, size: 25),
+      label: Text(TextsInApp.getText("start"), style: TextStyle(fontSize: 15)),
+    );
+  }
+
+  static ElevatedButton getPauseButtonForTimer(bool isRunning, pauseTimer) {
+    return ElevatedButton.icon(
+      onPressed: isRunning ? pauseTimer : null,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.orange,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        elevation: 5,
+      ),
+      icon: const Icon(Icons.pause, size: 25),
+      label: Text(TextsInApp.getText("pause"), style: TextStyle(fontSize: 15)),
+    );
+  }
+
+  static ElevatedButton getResetButtonForTimer(resetTimer) {
+    return ElevatedButton.icon(
+      onPressed: resetTimer,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.redAccent,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        elevation: 5,
+      ),
+      icon: const Icon(Icons.replay, size: 25),
+      label: Text(TextsInApp.getText("reset"), style: TextStyle(fontSize: 15)),
+    );
+  }
+}
+
 class ActionButton extends StatelessWidget {
   final Routine routine;
   final double fontSize;
