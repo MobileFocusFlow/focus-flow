@@ -46,12 +46,8 @@ class _HomePageState extends State<HomePage>
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDarkMode
-                ? [Colors.black87, Colors.black54, Colors.black45]
-                : [
-                    Colors.orange.shade100,
-                    Colors.orange.shade300,
-                    Colors.orange.shade400
-                  ],
+                ? [Colors.grey.shade500, Colors.black12]
+                : [Colors.orangeAccent, Colors.pinkAccent],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -72,8 +68,7 @@ class _HomePageState extends State<HomePage>
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
-                        color:
-                            isDarkMode ? Colors.white : Colors.orange.shade800,
+                        color: Colors.white,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -93,7 +88,7 @@ class _HomePageState extends State<HomePage>
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepOrange.shade400,
+                        backgroundColor: Colors.deepOrange.shade600,
                         padding: const EdgeInsets.symmetric(
                             vertical: 18, horizontal: 40),
                         textStyle: TextStyle(fontSize: fontSize),
@@ -138,7 +133,7 @@ class _HomePageState extends State<HomePage>
                             TextStyle(color: Colors.white, fontSize: fontSize),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepOrange.shade400,
+                        backgroundColor: Colors.deepOrange.shade600,
                         padding: const EdgeInsets.symmetric(
                             vertical: 18, horizontal: 50),
                         shape: RoundedRectangleBorder(

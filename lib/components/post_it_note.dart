@@ -31,48 +31,61 @@ class _PostItNoteState extends State<PostItNote> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.yellow[200],
-        borderRadius: BorderRadius.circular(8.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 6.0,
-            spreadRadius: 1.0,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextField(
-            controller: _controller,
-            maxLines: 10,
-            style: TextStyle(color: Colors.black),
-            decoration: InputDecoration(
-              hintText: TextsInApp.getText(
-                  "post_it_hint_text"), //'Write something...'
-              border: InputBorder.none,
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return Center(
+      child: Container(
+        width: screenWidth * 0.85, // 85% of the screen width
+        height: 280,
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.yellow[200],
+          borderRadius: BorderRadius.circular(8.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 6.0,
+              spreadRadius: 1.0,
             ),
-          ),
-          const SizedBox(height: 8.0),
-          // Save Button
-          ElevatedButton(
-            onPressed: () {
-              widget.onSave(_controller.text);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(TextsInApp.getText("post_it_saved"))),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.white,
-              backgroundColor: Colors.blue,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: TextField(
+                  controller: _controller,
+                  maxLines: null, // Allows wrapping of text
+                  style: const TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                    hintText: TextsInApp.getText(
+                        "post_it_hint_text"), //'Write something...'
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
             ),
-            child: Text(TextsInApp.getText("save")),
-          ),
-        ],
+            const SizedBox(height: 8.0),
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton(
+                onPressed: () {
+                  widget.onSave(_controller.text);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text(TextsInApp.getText("post_it_saved"))),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue,
+                ),
+                child: Text(TextsInApp.getText("save")),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

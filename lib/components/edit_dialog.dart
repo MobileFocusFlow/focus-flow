@@ -63,7 +63,7 @@ class _EditDialogState extends State<EditDialog> {
             _buildDateTimePicker(context),
             const SizedBox(height: 16),
             _buildTechniqueDropdown(),
-            if (selectedTechnique == 'Pomodoro') ...[
+            if (selectedTechnique == Routine.pomodoroIdentifier) ...[
               const SizedBox(height: 16),
               _buildDurationField(
                 TextsInApp.getText("work_dur") /*"Work Duration (minutes)"*/,
@@ -77,7 +77,7 @@ class _EditDialogState extends State<EditDialog> {
                 isWorkDuration: false,
               ),
             ],
-            if (selectedTechnique == 'Time Blocking') ...[
+            if (selectedTechnique == Routine.timeBlockingIdentifier) ...[
               const SizedBox(height: 16),
               _buildDurationField(
                 TextsInApp.getText("block_dur") /*"Block Duration (minutes)"*/,
@@ -162,7 +162,7 @@ class _EditDialogState extends State<EditDialog> {
 
   Widget _buildTechniqueDropdown() {
     return DropdownButtonFormField<String>(
-      value: selectedTechnique,
+      value: TextsInApp.getTechniqueNameWithLanguage(selectedTechnique),
       onChanged: (String? newValue) {
         if (newValue != null) {
           setState(() {
@@ -176,7 +176,11 @@ class _EditDialogState extends State<EditDialog> {
             TextsInApp.getText("working_technique") /*"Working Technique"*/,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       ),
-      items: ['Zen', 'Pomodoro', 'Time Blocking']
+      items: [
+        TextsInApp.getTechniqueNameWithLanguage(Routine.zenIdentifier),
+        TextsInApp.getTechniqueNameWithLanguage(Routine.pomodoroIdentifier),
+        TextsInApp.getTechniqueNameWithLanguage(Routine.timeBlockingIdentifier),
+      ]
           .map((technique) =>
               DropdownMenuItem(value: technique, child: Text(technique)))
           .toList(),
@@ -200,13 +204,13 @@ class _EditDialogState extends State<EditDialog> {
         setState(() {
           int? duration = int.tryParse(value);
 
-          if (selectedTechnique == 'Pomodoro') {
+          if (selectedTechnique == Routine.pomodoroIdentifier) {
             if (isWorkDuration) {
               routine.workDuration = duration ?? 25;
             } else {
               routine.breakDuration = duration ?? 5;
             }
-          } else if (selectedTechnique == 'Time Blocking') {
+          } else if (selectedTechnique == Routine.timeBlockingIdentifier) {
             routine.workDuration = duration ?? 60;
           }
         });
