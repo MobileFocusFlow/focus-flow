@@ -47,19 +47,27 @@ class UserDatabase {
     }
   }
 
-  static void increaseRoutineCount(Routine selectedRoutine) {
-    if (userRoutines.containsKey(activeEmail)) {
-      for (var group in customGroups[activeEmail]!.values) {
-        Routine r =
-            group.where((routine) => routine.key == selectedRoutine.key).first;
-        r.routineCount++;
-      }
-    }
-  }
-
   static Map<String, List<Routine>> getCustomGroups() {
     if (customGroups.containsKey(activeEmail)) {
       return customGroups[activeEmail]!;
+    }
+    return {};
+  }
+
+  static Map<String, List<Routine>> getCustomGroupsWithoutEisenhower() {
+    if (customGroups.containsKey(activeEmail)) {
+      Map<String, List<Routine>> filteredGroups = {};
+
+      customGroups[activeEmail]!.forEach((key, value) {
+        if ((!key.toLowerCase().contains("important") &&
+                !key.toLowerCase().contains("urgent")) ||
+            (!key.toLowerCase().contains("önemli") &&
+                !key.toLowerCase().contains("acil"))) {
+          filteredGroups[key] = value;
+        }
+      });
+
+      return filteredGroups;
     }
     return {};
   }

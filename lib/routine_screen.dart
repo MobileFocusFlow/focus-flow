@@ -4,6 +4,7 @@ import 'package:focusflow/eat_that_frog.dart';
 import 'package:focusflow/eisenhower_matrix_screen.dart';
 import 'package:focusflow/home_page.dart';
 import 'package:focusflow/login.dart';
+import 'package:focusflow/settings.dart';
 import 'components/language_select.dart';
 import 'main.dart';
 import 'task_batching_screen.dart';
@@ -28,21 +29,21 @@ class Routine {
 
   static Color getTechniqueColor(String technique, bool isDarkMode) {
     if (technique == pomodoroIdentifier) {
-      return isDarkMode ? Colors.red.shade300 : Colors.red.shade600;
+      return isDarkMode ? Colors.red.shade500 : Colors.red.shade800;
     } else if (technique == timeBlockingIdentifier) {
-      return isDarkMode ? Colors.teal.shade300 : Colors.teal.shade600;
+      return isDarkMode ? Colors.teal.shade500 : Colors.teal.shade800;
     } else if (technique == zenIdentifier) {
-      return isDarkMode ? Colors.green.shade300 : Colors.green.shade600;
+      return isDarkMode ? Colors.green.shade500 : Colors.green.shade800;
     } else if (technique == taskBatchingIdentifier) {
       return isDarkMode
-          ? Colors.deepPurpleAccent.shade200
-          : Colors.deepPurpleAccent.shade400;
+          ? Colors.deepPurpleAccent.shade400
+          : Colors.deepPurpleAccent.shade700;
     } else if (technique == eisenhowerIdentifier) {
-      return isDarkMode ? Colors.lightBlue.shade300 : Colors.lightBlue.shade600;
+      return isDarkMode ? Colors.lightBlue.shade500 : Colors.lightBlue.shade800;
     } else if (technique == eatThatFrogIdentifier) {
       return isDarkMode
-          ? Colors.deepOrange.shade300
-          : Colors.deepOrange.shade600;
+          ? Colors.deepOrange.shade500
+          : Colors.deepOrange.shade800;
     }
     return Colors.black;
   }
@@ -67,9 +68,10 @@ class Routine {
   String workingTechnique;
   int workDuration;
   int breakDuration;
-  int routineCount;
   String postItNote;
   int priority;
+  int isImportant;
+  int isUrgent;
 
   Routine(
     this.key,
@@ -78,9 +80,10 @@ class Routine {
     this.workingTechnique,
     this.workDuration,
     this.breakDuration,
-    this.routineCount,
     this.postItNote,
     this.priority,
+    this.isImportant,
+    this.isUrgent,
   );
 }
 
@@ -93,15 +96,17 @@ class RoutineScreen extends StatefulWidget {
 
 class RoutineScreenState extends State<RoutineScreen> {
   void _addRoutine(
-      String key,
-      String title,
-      DateTime dateTime,
-      String workingTechnique,
-      int workingDuration,
-      int? breakDuration,
-      int routineCount,
-      String postItNote,
-      int priority) {
+    String key,
+    String title,
+    DateTime dateTime,
+    String workingTechnique,
+    int workingDuration,
+    int? breakDuration,
+    String postItNote,
+    int priority,
+    int isImportant,
+    int isUrgent,
+  ) {
     final routine = Routine(
       key,
       title,
@@ -109,9 +114,10 @@ class RoutineScreenState extends State<RoutineScreen> {
       workingTechnique,
       workingDuration,
       workingTechnique == Routine.pomodoroIdentifier ? (breakDuration ?? 0) : 5,
-      routineCount,
       postItNote,
       priority,
+      isImportant,
+      isUrgent,
     );
 
     setState(() {
@@ -128,6 +134,12 @@ class RoutineScreenState extends State<RoutineScreen> {
         UserDatabase.getRoutines()[index] = updatedRoutine;
       }
     });
+  }
+
+  void _updateAllRoutines() {
+    for (var routine in UserDatabase.getRoutines()) {
+      _updateRoutine(routine);
+    }
   }
 
   void _navigateToTaskBatchingScreen() {
@@ -154,13 +166,21 @@ class RoutineScreenState extends State<RoutineScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const EisenhowerMatrixScreen(),
+        builder: (context) =>
+            EisenhowerMatrixScreen(onRoutineUpdated: _updateRoutine),
       ),
     );
   }
 
+  void _updateLanguage(String language) {
+    setState(() {
+      TextsInApp.setSelectedLanguage(language);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    _updateAllRoutines();
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
@@ -176,12 +196,12 @@ class RoutineScreenState extends State<RoutineScreen> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: isDarkMode
-                  ? [Colors.black, Colors.black45, Colors.black]
-                  : [
-                      Colors.deepOrangeAccent,
-                      Colors.deepOrangeAccent.shade200,
-                      Colors.deepOrangeAccent
-                    ],
+                  ? [
+                      Colors.black,
+                      const Color.fromARGB(255, 27, 12, 115),
+                      Colors.black
+                    ]
+                  : [Colors.deepOrangeAccent, Colors.orange],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -208,8 +228,8 @@ class RoutineScreenState extends State<RoutineScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: isDarkMode
-                    ? [Colors.black38, Colors.grey.shade900, Colors.black38]
-                    : [Colors.white, Colors.white],
+                    ? [Colors.deepPurple.shade900, Colors.black]
+                    : [Colors.orangeAccent, Colors.pinkAccent],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -222,35 +242,31 @@ class RoutineScreenState extends State<RoutineScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: Text(
-                      TextsInApp.getText(
-                          "routine_screen_working_techniques"), //"Working Techniques",
+                      "-${TextsInApp.getText("routine_screen_working_techniques")}-", //"Working Techniques",
                       style: TextStyle(
-                        fontSize: fontSize + 10,
+                        fontSize: fontSize + 5,
                         fontWeight: FontWeight.bold,
-                        color:
-                            isDarkMode ? Colors.white : Colors.deepOrangeAccent,
+                        color: Colors.white,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  _buildTechniqueCards(isDarkMode, fontSize),
-                  const SizedBox(height: 32),
+                  _buildResponsiveTechniqueGrid(isDarkMode, fontSize),
+                  const SizedBox(height: 15),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: Text(
-                      TextsInApp.getText(
-                          "routine_screen_task_handling"), //"Task Handling",
+                      "-${TextsInApp.getText("routine_screen_task_handling")}-", //"Task Handling",
                       style: TextStyle(
-                        fontSize: fontSize + 10,
+                        fontSize: fontSize + 5,
                         fontWeight: FontWeight.bold,
-                        color:
-                            isDarkMode ? Colors.white : Colors.deepOrangeAccent,
+                        color: Colors.white,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  _buildTaskHandlingCards(isDarkMode, fontSize),
-                  const SizedBox(height: 16),
+                  _buildResponsiveTaskHandlingGrid(isDarkMode, fontSize),
+                  const SizedBox(height: 10),
                   Expanded(
                     child: RoutineList(
                       onRoutineUpdated: _updateRoutine,
@@ -283,9 +299,9 @@ class RoutineScreenState extends State<RoutineScreen> {
                 isDarkMode),
             _buildNavBarIcon(
                 context,
-                Icons.notifications,
-                TextsInApp.getText("routine_screen_alerts") /*"Alerts"*/,
-                null,
+                Icons.settings,
+                TextsInApp.getText("routine_screen_settings") /*"Settings"*/,
+                SettingsScreen(updateLanguageCallback: _updateLanguage),
                 isDarkMode),
             _buildNavBarIcon(
                 context,
@@ -313,12 +329,11 @@ class RoutineScreenState extends State<RoutineScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 25),
-          const SizedBox(height: 4),
+          Icon(icon, color: Colors.white, size: 19),
           Text(
             label,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 13,
               color: isDarkMode ? Colors.grey.shade300 : Colors.white,
               fontWeight: FontWeight.bold,
             ),
@@ -328,57 +343,79 @@ class RoutineScreenState extends State<RoutineScreen> {
     );
   }
 
-  Widget _buildTaskHandlingCards(bool isDarkMode, double fontSize) {
-    return Wrap(
-      spacing: 15.0,
-      runSpacing: 14.0,
-      children: [
-        _buildTechniqueCard(
-          Routine.taskBatchingIdentifier,
-          Routine.taskBatchingIcon,
-          Routine.getTechniqueColor(Routine.taskBatchingIdentifier, isDarkMode),
-          fontSize,
-        ),
-        _buildTechniqueCard(
-          Routine.eisenhowerIdentifier,
-          Routine.eisenhowerIcon,
-          Routine.getTechniqueColor(Routine.eisenhowerIdentifier, isDarkMode),
-          fontSize,
-        ),
-        _buildTechniqueCard(
-          Routine.eatThatFrogIdentifier,
-          Routine.eatThatFrogIcon,
-          Routine.getTechniqueColor(Routine.eatThatFrogIdentifier, isDarkMode),
-          fontSize,
-        ),
-      ],
+  Widget _buildResponsiveTaskHandlingGrid(bool isDarkMode, double fontSize) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        int crossAxisCount =
+            3; //constraints.maxWidth ~/ 140; // Adjust column count
+        return GridView.count(
+          crossAxisCount: crossAxisCount > 0 ? crossAxisCount : 1,
+          mainAxisSpacing: 10.0,
+          crossAxisSpacing: 10.0,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            _buildTechniqueCard(
+              Routine.taskBatchingIdentifier,
+              Routine.taskBatchingIcon,
+              Routine.getTechniqueColor(
+                  Routine.taskBatchingIdentifier, isDarkMode),
+              fontSize,
+            ),
+            _buildTechniqueCard(
+              Routine.eisenhowerIdentifier,
+              Routine.eisenhowerIcon,
+              Routine.getTechniqueColor(
+                  Routine.eisenhowerIdentifier, isDarkMode),
+              fontSize,
+            ),
+            _buildTechniqueCard(
+              Routine.eatThatFrogIdentifier,
+              Routine.eatThatFrogIcon,
+              Routine.getTechniqueColor(
+                  Routine.eatThatFrogIdentifier, isDarkMode),
+              fontSize,
+            ),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildTechniqueCards(bool isDarkMode, double fontSize) {
-    return Wrap(
-      spacing: 15.0,
-      runSpacing: 14.0,
-      children: [
-        _buildTechniqueCard(
-          Routine.zenIdentifier,
-          Routine.zenIcon,
-          Routine.getTechniqueColor(Routine.zenIdentifier, isDarkMode),
-          fontSize,
-        ),
-        _buildTechniqueCard(
-          Routine.pomodoroIdentifier,
-          Routine.pomodoroIcon,
-          Routine.getTechniqueColor(Routine.pomodoroIdentifier, isDarkMode),
-          fontSize,
-        ),
-        _buildTechniqueCard(
-          Routine.timeBlockingIdentifier,
-          Routine.timeBlockingIcon,
-          Routine.getTechniqueColor(Routine.timeBlockingIdentifier, isDarkMode),
-          fontSize,
-        ),
-      ],
+  Widget _buildResponsiveTechniqueGrid(bool isDarkMode, double fontSize) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        int crossAxisCount =
+            3; //constraints.maxWidth ~/ 140; // Adjust column count
+        return GridView.count(
+          crossAxisCount: crossAxisCount > 0 ? crossAxisCount : 1,
+          mainAxisSpacing: 10.0,
+          crossAxisSpacing: 10.0,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            _buildTechniqueCard(
+              Routine.zenIdentifier,
+              Routine.zenIcon,
+              Routine.getTechniqueColor(Routine.zenIdentifier, isDarkMode),
+              fontSize,
+            ),
+            _buildTechniqueCard(
+              Routine.pomodoroIdentifier,
+              Routine.pomodoroIcon,
+              Routine.getTechniqueColor(Routine.pomodoroIdentifier, isDarkMode),
+              fontSize,
+            ),
+            _buildTechniqueCard(
+              Routine.timeBlockingIdentifier,
+              Routine.timeBlockingIcon,
+              Routine.getTechniqueColor(
+                  Routine.timeBlockingIdentifier, isDarkMode),
+              fontSize,
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -400,9 +437,9 @@ class RoutineScreenState extends State<RoutineScreen> {
         borderRadius: BorderRadius.circular(16),
         color: cardColor,
         child: Container(
-          height: 150,
-          width: 150,
-          padding: const EdgeInsets.all(16),
+          height: 111,
+          width: 111,
+          padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(
             color: cardColor,
             borderRadius: BorderRadius.circular(16),
@@ -418,14 +455,14 @@ class RoutineScreenState extends State<RoutineScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: Colors.white, size: 35),
+              Icon(icon, color: Colors.white, size: 32),
               const SizedBox(height: 8),
               Text(
-                technique,
+                TextsInApp.getTechniqueNameWithLanguage(technique),
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: fontSize + 2,
-                  fontWeight: FontWeight.bold,
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.normal,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -445,7 +482,7 @@ class RoutineScreenState extends State<RoutineScreen> {
         return Dialog(
           backgroundColor: isDarkMode ? Colors.grey[800] : Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -456,7 +493,7 @@ class RoutineScreenState extends State<RoutineScreen> {
                   valueListenable: FontSizeNotifier.fontSizeNotifier,
                   builder: (context, fontSize, child) {
                     return Text(
-                      "${TextsInApp.getText("routine_screen_create_routine_for")}$technique" /*"Create a Routine for "*/,
+                      "${TextsInApp.getText("routine_screen_create_routine_for")}${TextsInApp.getTechniqueNameWithLanguage(technique)}" /*"Create a Routine for "*/,
                       style: TextStyle(
                         fontSize: fontSize,
                         fontWeight: FontWeight.bold,

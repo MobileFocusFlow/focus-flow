@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:focusflow/routine_screen.dart';
+import 'components/action_button.dart';
 import 'components/language_select.dart';
+import 'components/quote_manager.dart';
 
 class ZenScreen extends StatefulWidget {
   final Routine selectedRoutine;
@@ -17,10 +19,13 @@ class ZenScreen extends StatefulWidget {
 }
 
 class _ZenScreenState extends State<ZenScreen> {
+  late String _motivationalQuote;
   @override
   void initState() {
     super.initState();
     _timeRemaining = 0;
+    _motivationalQuote =
+        QuoteManager.getRandomQuote(TextsInApp.getLanguageCode());
   }
 
   late int _timeRemaining;
@@ -81,81 +86,67 @@ class _ZenScreenState extends State<ZenScreen> {
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Zen Mode: ${widget.selectedRoutine.title}"),
-        backgroundColor:
-            Routine.getTechniqueColor(Routine.zenIdentifier, isDarkMode),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              widget.selectedRoutine.title,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepOrangeAccent,
+      appBar: AppDecorations.getTechniqueAppBar(
+          widget.selectedRoutine.title, isDarkMode, Routine.zenIdentifier),
+      body: Stack(
+        children: [
+          Align(
+            alignment: Alignment.center,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    widget.selectedRoutine.title,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Routine.getTechniqueColor(
+                              Routine.zenIdentifier, isDarkMode),
+                        ),
                   ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              _formatTime(_timeRemaining),
-              style: TextStyle(
-                fontSize: 64,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black87,
+                  const SizedBox(height: 24),
+                  Text(
+                    _formatTime(_timeRemaining),
+                    style: TextStyle(
+                      fontSize: 64,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      AppDecorations.getStartButtonForTimer(
+                          _isRunning, _startTimer),
+                      AppDecorations.getPauseButtonForTimer(
+                          _isRunning, _pauseTimer),
+                      AppDecorations.getResetButtonForTimer(_resetTimer),
+                    ],
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _isRunning ? null : _startTimer,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  icon: const Icon(Icons.play_arrow, size: 25),
-                  label: Text(TextsInApp.getText("start")), //"Start"
-                ),
-                ElevatedButton.icon(
-                  onPressed: _isRunning ? _pauseTimer : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  icon: const Icon(Icons.pause, size: 25),
-                  label: Text(TextsInApp.getText("pause")), //"Pause"
-                ),
-                ElevatedButton.icon(
-                  onPressed: _resetTimer,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  icon: const Icon(Icons.replay, size: 25),
-                  label: Text(TextsInApp.getText("reset")), //"Reset"
-                ),
-              ],
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0)
+                  .copyWith(bottom: 16.0),
+              child: QuoteManager.addQuoteContainer(
+                  _motivationalQuote, context, _changeQuote),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
+  }
+
+  void _changeQuote() {
+    setState(() {
+      _motivationalQuote =
+          QuoteManager.getRandomQuote(TextsInApp.getLanguageCode());
+    });
   }
 }

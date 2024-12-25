@@ -46,10 +46,6 @@ class EatThatFrogScreenState extends State<EatThatFrogScreen> {
           ),
         ),
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("No routines available to start.")),
-      );
     }
   }
 
@@ -59,8 +55,9 @@ class EatThatFrogScreenState extends State<EatThatFrogScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Eat That Frog",
+        title: Text(
+          TextsInApp.getTechniqueNameWithLanguage(
+              Routine.eatThatFrogIdentifier),
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -83,10 +80,27 @@ class EatThatFrogScreenState extends State<EatThatFrogScreen> {
                       final routine = _sortedRoutines[index];
                       return Card(
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(15),
                         ),
                         elevation: 4,
                         child: ListTile(
+                          style: ListTileStyle.list,
+                          /*tileColor: isDarkMode
+                          ? Colors.deepPurple.shade900
+                          : Colors.deepOrange.shade600,*/
+                          onTap: () {
+                            UserDatabase.lastSelectedRoutine = routine;
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => RoutineDetailsScreen(
+                                  onRoutinesUpdated: (updatedRoutine) {
+                                    widget.onRoutineUpdated(updatedRoutine);
+                                  },
+                                ),
+                              ),
+                            );
+                          },
                           leading: Icon(
                             Routine.getTechniqueIcon(routine.workingTechnique),
                             color: Routine.getTechniqueColor(
@@ -102,7 +116,7 @@ class EatThatFrogScreenState extends State<EatThatFrogScreen> {
                           subtitle: Row(
                             children: [
                               Text(
-                                "Difficulty: ${routine.priority}",
+                                "${TextsInApp.getText("difficulty")}: ${routine.priority}",
                                 style: TextStyle(fontSize: fontSize * 0.85),
                               ),
                               const SizedBox(width: 16),
@@ -110,28 +124,21 @@ class EatThatFrogScreenState extends State<EatThatFrogScreen> {
                                 onPressed: () =>
                                     _showDifficultyDialog(context, routine),
                                 style: ElevatedButton.styleFrom(
+                                  backgroundColor: Routine.getTechniqueColor(
+                                      Routine.eatThatFrogIdentifier,
+                                      isDarkMode),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 10,
                                     vertical: 5,
                                   ),
                                 ),
-                                child: const Text("Set Difficulty"),
+                                child: Text(TextsInApp.getText(
+                                    "set_difficulty")), //"Set Difficulty"
                               ),
                             ],
                           ),
                           trailing: const Icon(Icons.arrow_forward,
                               color: Colors.grey),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => RoutineDetailsScreen(
-                                    onRoutinesUpdated: (updatedRoutine) {
-                                  widget.onRoutineUpdated(updatedRoutine);
-                                }),
-                              ),
-                            );
-                          },
                         ),
                       );
                     },
@@ -186,14 +193,15 @@ class EatThatFrogScreenState extends State<EatThatFrogScreen> {
           builder: (context, fontSize, child) {
             return AlertDialog(
               title: Text(
-                "Set difficulty",
+                TextsInApp.getText("set_difficulty"), //"Set difficulty"
                 style: TextStyle(fontSize: fontSize),
               ),
               content: TextField(
                 controller: difficultyController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: "Enter difficulty",
+                  labelText: TextsInApp.getText(
+                      "eat_that_frog_enter_difficulty"), // "Enter difficulty"
                   labelStyle: TextStyle(fontSize: fontSize * 0.85),
                   border: const OutlineInputBorder(),
                 ),
@@ -205,7 +213,7 @@ class EatThatFrogScreenState extends State<EatThatFrogScreen> {
                     Navigator.of(context).pop();
                   },
                   child: Text(
-                    "Cancel",
+                    TextsInApp.getText("cancel"),
                     style: TextStyle(fontSize: fontSize),
                   ),
                 ),
@@ -219,7 +227,7 @@ class EatThatFrogScreenState extends State<EatThatFrogScreen> {
                     Navigator.of(context).pop();
                   },
                   child: Text(
-                    "Save",
+                    TextsInApp.getText("save"),
                     style: TextStyle(fontSize: fontSize),
                   ),
                 ),
