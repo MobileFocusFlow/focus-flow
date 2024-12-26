@@ -245,6 +245,28 @@ class _RoutineCreationFormState extends State<RoutineCreationForm> {
       _selectedDate ??= DateTime.now();
       _selectedTime ??= TimeOfDay.now();
 
+      if (_selectedDate!.year < DateTime.now().year ||
+          (_selectedDate!.year >= DateTime.now().year &&
+              _selectedDate!.month < DateTime.now().month) ||
+          (_selectedDate!.year >= DateTime.now().year &&
+              _selectedDate!.month >= DateTime.now().month &&
+              _selectedDate!.day < DateTime.now().day)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Invalid Date')),
+        );
+        return;
+      } else if (_selectedTime!.hour < DateTime.now().hour ||
+          (_selectedTime!.hour >= DateTime.now().hour &&
+              _selectedTime!.minute < DateTime.now().minute) ||
+          (_selectedTime!.hour >= DateTime.now().hour &&
+              _selectedDate!.minute >= DateTime.now().minute &&
+              _selectedDate!.second < DateTime.now().second)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Invalid Time')),
+        );
+        return;
+      }
+
       final combinedDateTime = DateTime(
         _selectedDate!.year,
         _selectedDate!.month,

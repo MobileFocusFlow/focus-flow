@@ -104,6 +104,8 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
     setState(() {
       for (var routines in matrixQuadrants.values) {
         routines.remove(routine);
+        routine.isImportant = -1;
+        routine.isUrgent = -1;
       }
       if (!technicalGroups.containsKey(group)) {
         technicalGroups[group] = [];
@@ -127,7 +129,7 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
                   Routine.eisenhowerIdentifier),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: fontSize + 4, // Slightly larger for emphasis
+                fontSize: fontSize + 4,
                 color: Colors.white,
               ),
             );
@@ -148,7 +150,7 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
                     child: Text(
                       "-${TextsInApp.getText("eisenhower_technical_groups")}-",
                       style: TextStyle(
-                        fontSize: fontSize + 4, // Dynamic font size
+                        fontSize: fontSize + 4,
                         fontWeight: FontWeight.bold,
                         color: Colors.blueAccent,
                       ),
@@ -167,7 +169,7 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
                     child: Text(
                       "-${TextsInApp.getText("eisenhower_matrix")}-",
                       style: TextStyle(
-                        fontSize: fontSize + 4, // Dynamic font size
+                        fontSize: fontSize + 4,
                         fontWeight: FontWeight.bold,
                         color: Colors.orange,
                       ),
@@ -206,7 +208,7 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
               technique,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: fontSize, // Dynamic font size
+                fontSize: fontSize,
                 color: Routine.getTechniqueColor(technique, isDarkMode),
               ),
             );
@@ -237,9 +239,6 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
               );
             },
             style: ListTileStyle.list,
-            /*tileColor: isDarkMode
-                          ? Colors.deepPurple.shade900
-                          : Colors.deepOrange.shade600,*/
             title: ValueListenableBuilder<double>(
               valueListenable: FontSizeNotifier.fontSizeNotifier,
               builder: (context, fontSize, child) {
@@ -254,13 +253,14 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
               valueListenable: FontSizeNotifier.fontSizeNotifier,
               builder: (context, fontSize, child) {
                 return Text(
-                  "${TextsInApp.getText("scheduled")}: ${routine.dateTime.toLocal().toString().split(' ')[0]}",
+                  routine.dateTime.toLocal().toString().split(' ')[0],
                   style: TextStyle(fontSize: fontSize - 2, color: Colors.grey),
                 );
               },
             ),
             trailing: IconButton(
-              icon: const Icon(Icons.arrow_forward, color: Colors.green),
+              icon: const Icon(Icons.arrow_forward,
+                  color: Colors.green, size: 32),
               onPressed: () => _showMoveToQuadrantDialog(routine),
             ),
           );
@@ -275,10 +275,10 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
       shrinkWrap: true,
       padding: const EdgeInsets.symmetric(vertical: 8),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 1, // Single column layout
-        mainAxisSpacing: 10, // Spacing between groups
-        crossAxisSpacing: 0, // No horizontal spacing
-        mainAxisExtent: 260, // Set the height of each group explicitly
+        crossAxisCount: 1,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 0,
+        mainAxisExtent: 260,
       ),
       itemCount: matrixQuadrants.length,
       itemBuilder: (context, index) {
@@ -364,9 +364,6 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
                         );
                       },
                       style: ListTileStyle.list,
-                      /*tileColor: isDarkMode
-                          ? Colors.deepPurple.shade900
-                          : Colors.deepOrange.shade600,*/
                       title: ValueListenableBuilder<double>(
                         valueListenable: FontSizeNotifier.fontSizeNotifier,
                         builder: (context, fontSize, child) {
@@ -383,7 +380,7 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
                         valueListenable: FontSizeNotifier.fontSizeNotifier,
                         builder: (context, fontSize, child) {
                           return Text(
-                            "${TextsInApp.getText("scheduled")}: ${routine.dateTime.toLocal().toString().split(' ')[0]}",
+                            routine.dateTime.toLocal().toString().split(' ')[0],
                             style: TextStyle(
                               fontSize: fontSize - 2,
                               color: Colors.grey,
@@ -392,8 +389,8 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
                         },
                       ),
                       trailing: IconButton(
-                        icon:
-                            const Icon(Icons.arrow_back, color: Colors.orange),
+                        icon: const Icon(Icons.arrow_back,
+                            color: Colors.orange, size: 32),
                         onPressed: () => _moveRoutineBackToTechniqueGroup(
                             routine.workingTechnique, routine),
                       ),
