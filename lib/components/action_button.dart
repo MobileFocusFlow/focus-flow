@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:focusflow/zen_screen.dart';
+import '../calendar.dart';
+import '../home_page.dart';
+import '../login.dart';
 import '../pomodoro_screen.dart';
+import '../settings.dart';
 import '../time_blocking_screen.dart';
 import '../routine_screen.dart';
 import 'language_select.dart';
@@ -77,6 +81,46 @@ class AppDecorations {
       ),
       icon: const Icon(Icons.replay, size: 25),
       label: Text(TextsInApp.getText("reset"), style: TextStyle(fontSize: 15)),
+    );
+  }
+
+  static BottomAppBar getAppBottomBar(
+      buildNavBarIcon, isDarkMode, context, updateLanguage, updateRoutine) {
+    return BottomAppBar(
+      color: isDarkMode ? Colors.black : Colors.deepOrangeAccent,
+      height: 70,
+      shape: const CircularNotchedRectangle(),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          buildNavBarIcon(
+              context,
+              Icons.home,
+              TextsInApp.getText("routine_screen_home") /*"Home"*/,
+              const HomePage(),
+              isDarkMode),
+          buildNavBarIcon(
+              context,
+              Icons.calendar_month_outlined,
+              TextsInApp.getText("routine_screen_calendar") /*"Calendar"*/,
+              CalendarScreen(
+                onRoutineUpdated: updateRoutine,
+              ),
+              isDarkMode),
+          buildNavBarIcon(
+              context,
+              Icons.settings,
+              TextsInApp.getText("routine_screen_settings") /*"Settings"*/,
+              SettingsScreen(updateLanguageCallback: updateLanguage),
+              isDarkMode),
+          buildNavBarIcon(
+              context,
+              Icons.person,
+              TextsInApp.getText("routine_screen_profile") /*"Profile"*/,
+              const LoginScreen(),
+              isDarkMode),
+        ],
+      ),
     );
   }
 }

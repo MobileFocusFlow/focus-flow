@@ -84,8 +84,7 @@ class _RoutineListState extends State<RoutineList> {
                           ),
                         ),
                         subtitle: Text(
-                          //"Scheduled: ${routine.dateTime.toLocal().toString().split(' ')[0]} at ${routine.dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}"
-                          "${TextsInApp.getText("scheduled")} ${routine.dateTime.toLocal().toString().split(' ')[0]} ${TextsInApp.getText("at")} ${routine.dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}",
+                          "${routine.dateTime.toLocal().toString().split(' ')[0]} ${TextsInApp.getText("at")} ${routine.dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}",
                           style: TextStyle(
                             fontSize: fontSize - 2,
                             color: Colors.grey,
@@ -134,7 +133,6 @@ class _RoutineListState extends State<RoutineList> {
                   ),
                   elevation: 4,
                   child: SizedBox(
-                    height: 80,
                     width: 450,
                     child: ListTile(
                       leading: Icon(
@@ -149,7 +147,7 @@ class _RoutineListState extends State<RoutineList> {
                         ),
                       ),
                       subtitle: Text(
-                        "${TextsInApp.getText("scheduled")} ${routine.dateTime.toLocal().toString().split(' ')[0]} ${TextsInApp.getText("at")} ${routine.dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}",
+                        "${routine.dateTime.toLocal().toString().split(' ')[0]} ${TextsInApp.getText("at")} ${routine.dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}",
                         style: TextStyle(
                           fontSize: fontSize - 3,
                           color: Colors.grey,
@@ -162,9 +160,6 @@ class _RoutineListState extends State<RoutineList> {
                         },
                       ),
                       style: ListTileStyle.list,
-                      /*tileColor: isDarkMode
-                          ? Colors.deepPurple.shade900
-                          : Colors.deepOrange.shade600,*/
                       onTap: () {
                         UserDatabase.lastSelectedRoutine = routine;
                         Navigator.push(

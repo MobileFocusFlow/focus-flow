@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:focusflow/components/language_select.dart';
-import 'package:focusflow/pomodoro_screen.dart';
-import 'package:focusflow/task_batching_screen.dart';
-import 'package:focusflow/time_blocking_screen.dart';
-import 'package:focusflow/zen_screen.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'components/action_button.dart';
+import 'routine_details_screen.dart';
 import 'routine_screen.dart';
 import 'temp_user_db.dart';
 
 class CalendarScreen extends StatefulWidget {
-  const CalendarScreen({super.key});
+  final Function(Routine) onRoutineUpdated;
+  const CalendarScreen({super.key, required this.onRoutineUpdated});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -46,24 +45,89 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return _events[DateTime(day.year, day.month, day.day)] ?? [];
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(TextsInApp.getText(
-            "calendar_routine_calendar") /*'Task Calendar'*/),
-        centerTitle: true,
-      ),
-      body: Column(
+  void _updateLanguage(String language) {
+    setState(() {
+      TextsInApp.setSelectedLanguage(language);
+    });
+  }
+
+  void _updateRoutine(Routine updatedRoutine) {
+    setState(() {
+      final index = UserDatabase.getRoutines().indexWhere((routine) =>
+          routine.title == updatedRoutine.title &&
+          routine.dateTime == updatedRoutine.dateTime);
+      if (index != -1) {
+        UserDatabase.getRoutines()[index] = updatedRoutine;
+      }
+    });
+  }
+
+  Widget _buildNavBarIcon(BuildContext context, IconData icon, String label,
+      Widget? screen, bool isDarkMode) {
+    return GestureDetector(
+      onTap: screen != null
+          ? () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => screen),
+              );
+            }
+          : null,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          _buildCalendar(),
-          const SizedBox(height: 16.0),
-          Expanded(
-            child: _buildTaskList(),
+          Icon(icon, color: Colors.white, size: 19),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              color: isDarkMode ? Colors.grey.shade300 : Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(TextsInApp.getText(
+              "calendar_routine_calendar") /*'Task Calendar'*/),
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          toolbarHeight: 70,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isDarkMode
+                    ? [
+                        Colors.black,
+                        const Color.fromARGB(255, 27, 12, 115),
+                        Colors.black
+                      ]
+                    : [Colors.deepOrangeAccent, Colors.orange],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+        ),
+        body: Column(
+          children: [
+            _buildCalendar(),
+            const SizedBox(height: 16.0),
+            Expanded(
+              child: _buildTaskList(),
+            ),
+          ],
+        ),
+        bottomNavigationBar: AppDecorations.getAppBottomBar(_buildNavBarIcon,
+            isDarkMode, context, _updateLanguage, _updateRoutine));
   }
 
   Widget _buildCalendar() {
@@ -163,11 +227,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
           child: ListTile(
             onTap: () {
               Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => _navigateToRoutineScreen(routine),
-                ),
-              );
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RoutineDetailsScreen(
+                      onRoutinesUpdated: (updatedRoutine) {
+                        widget.onRoutineUpdated(updatedRoutine);
+                      },
+                    ),
+                  ));
             },
             leading: Icon(
               _getIconForTechnique(routine.workingTechnique),
@@ -179,7 +246,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   .copyWith(fontWeight: FontWeight.bold),
             ),
             subtitle: Text(
-              "${TextsInApp.getText("working_technique")}: ${routine.workingTechnique}\n${TextsInApp.getText("scheduled")}: ${routine.dateTime.hour}:${routine.dateTime.minute}:${routine.dateTime.second}\n${TextsInApp.getText("work_dur")}: ${routine.workDuration}",
+              "${TextsInApp.getText("working_technique")}: ${routine.workingTechnique}\n${routine.dateTime.hour}:${routine.dateTime.minute}:${routine.dateTime.second}\n${TextsInApp.getText("work_dur")}: ${routine.workDuration}",
               /*'Working Technique:Scheduled*/
               style: theme.textTheme.bodySmall,
             ),
@@ -191,17 +258,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
         );
       },
     );
-  }
-
-  Widget _navigateToRoutineScreen(Routine routine) {
-    if (routine.workingTechnique == Routine.pomodoroIdentifier) {
-      return PomodoroScreen(selectedRoutine: routine);
-    } else if (routine.workingTechnique == Routine.timeBlockingIdentifier) {
-      return TimeBlockingScreen(selectedRoutine: routine);
-    } else if (routine.workingTechnique == Routine.zenIdentifier) {
-      return ZenScreen(selectedRoutine: routine);
-    }
-    return TaskBatchingScreen();
   }
 
   IconData _getIconForTechnique(String technique) {

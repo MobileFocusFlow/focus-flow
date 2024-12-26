@@ -85,9 +85,6 @@ class EatThatFrogScreenState extends State<EatThatFrogScreen> {
                         elevation: 4,
                         child: ListTile(
                           style: ListTileStyle.list,
-                          /*tileColor: isDarkMode
-                          ? Colors.deepPurple.shade900
-                          : Colors.deepOrange.shade600,*/
                           onTap: () {
                             UserDatabase.lastSelectedRoutine = routine;
                             Navigator.push(
@@ -109,15 +106,15 @@ class EatThatFrogScreenState extends State<EatThatFrogScreen> {
                           title: Text(
                             routine.title,
                             style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: fontSize,
+                              fontWeight: FontWeight.bold,
+                              fontSize: fontSize + 4,
                             ),
                           ),
                           subtitle: Row(
                             children: [
                               Text(
                                 "${TextsInApp.getText("difficulty")}: ${routine.priority}",
-                                style: TextStyle(fontSize: fontSize * 0.85),
+                                style: TextStyle(fontSize: fontSize),
                               ),
                               const SizedBox(width: 16),
                               ElevatedButton(
@@ -129,11 +126,13 @@ class EatThatFrogScreenState extends State<EatThatFrogScreen> {
                                       isDarkMode),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 10,
-                                    vertical: 5,
+                                    vertical: 7,
                                   ),
                                 ),
-                                child: Text(TextsInApp.getText(
-                                    "set_difficulty")), //"Set Difficulty"
+                                child: Text(
+                                  TextsInApp.getText("set_difficulty"),
+                                  style: TextStyle(color: Colors.white),
+                                ), //"Set Difficulty"
                               ),
                             ],
                           ),

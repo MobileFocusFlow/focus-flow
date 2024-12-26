@@ -25,7 +25,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(TextsInApp.getText("routine_screen_settings")), //'Settings'
-        backgroundColor: Colors.deepPurpleAccent,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        toolbarHeight: 70,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: isDarkMode
+                  ? [
+                      Colors.black,
+                      const Color.fromARGB(255, 27, 12, 115),
+                      Colors.black
+                    ]
+                  : [Colors.deepOrangeAccent, Colors.orange],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {

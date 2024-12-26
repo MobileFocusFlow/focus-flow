@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:focusflow/calendar.dart';
 import 'package:focusflow/eat_that_frog.dart';
 import 'package:focusflow/eisenhower_matrix_screen.dart';
-import 'package:focusflow/home_page.dart';
-import 'package:focusflow/login.dart';
-import 'package:focusflow/settings.dart';
+import 'components/action_button.dart';
 import 'components/language_select.dart';
 import 'main.dart';
 import 'task_batching_screen.dart';
@@ -146,7 +143,8 @@ class RoutineScreenState extends State<RoutineScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => TaskBatchingScreen(),
+        builder: (context) =>
+            TaskBatchingScreen(onRoutineUpdated: _updateRoutine),
       ),
     );
   }
@@ -183,136 +181,103 @@ class RoutineScreenState extends State<RoutineScreen> {
     _updateAllRoutines();
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          TextsInApp.getText("routine_screen_my_routines"), //"My Routines",
-          style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-        toolbarHeight: 70,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: isDarkMode
-                  ? [
-                      Colors.black,
-                      const Color.fromARGB(255, 27, 12, 115),
-                      Colors.black
-                    ]
-                  : [Colors.deepOrangeAccent, Colors.orange],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+        appBar: AppBar(
+          title: Text(
+            TextsInApp.getText("routine_screen_my_routines"), //"My Routines",
+            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
           ),
-        ),
-        actions: [
-          Switch(
-            value: isDarkMode,
-            activeColor: Colors.white,
-            onChanged: (value) {
-              setState(() {
-                ThemeNotifier.themeNotifier.value =
-                    value ? ThemeMode.dark : ThemeMode.light;
-              });
-            },
-          ),
-          const SizedBox(width: 10),
-        ],
-      ),
-      body: ValueListenableBuilder<double>(
-        valueListenable: FontSizeNotifier.fontSizeNotifier,
-        builder: (context, fontSize, child) {
-          return Container(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          centerTitle: true,
+          toolbarHeight: 70,
+          flexibleSpace: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: isDarkMode
-                    ? [Colors.deepPurple.shade900, Colors.black]
-                    : [Colors.orangeAccent, Colors.pinkAccent],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+                    ? [
+                        Colors.black,
+                        const Color.fromARGB(255, 27, 12, 115),
+                        Colors.black
+                      ]
+                    : [Colors.deepOrangeAccent, Colors.orange],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  const SizedBox(height: 4),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: Text(
-                      "-${TextsInApp.getText("routine_screen_working_techniques")}-", //"Working Techniques",
-                      style: TextStyle(
-                        fontSize: fontSize + 5,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  _buildResponsiveTechniqueGrid(isDarkMode, fontSize),
-                  const SizedBox(height: 15),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: Text(
-                      "-${TextsInApp.getText("routine_screen_task_handling")}-", //"Task Handling",
-                      style: TextStyle(
-                        fontSize: fontSize + 5,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  _buildResponsiveTaskHandlingGrid(isDarkMode, fontSize),
-                  const SizedBox(height: 10),
-                  Expanded(
-                    child: RoutineList(
-                      onRoutineUpdated: _updateRoutine,
-                    ),
-                  ),
-                ],
-              ),
+          ),
+          actions: [
+            Switch(
+              value: isDarkMode,
+              activeColor: Colors.white,
+              onChanged: (value) {
+                setState(() {
+                  ThemeNotifier.themeNotifier.value =
+                      value ? ThemeMode.dark : ThemeMode.light;
+                });
+              },
             ),
-          );
-        },
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: isDarkMode ? Colors.black : Colors.deepOrangeAccent,
-        height: 70,
-        shape: const CircularNotchedRectangle(),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavBarIcon(
-                context,
-                Icons.home,
-                TextsInApp.getText("routine_screen_home") /*"Home"*/,
-                const HomePage(),
-                isDarkMode),
-            _buildNavBarIcon(
-                context,
-                Icons.calendar_month_outlined,
-                TextsInApp.getText("routine_screen_calendar") /*"Calendar"*/,
-                const CalendarScreen(),
-                isDarkMode),
-            _buildNavBarIcon(
-                context,
-                Icons.settings,
-                TextsInApp.getText("routine_screen_settings") /*"Settings"*/,
-                SettingsScreen(updateLanguageCallback: _updateLanguage),
-                isDarkMode),
-            _buildNavBarIcon(
-                context,
-                Icons.person,
-                TextsInApp.getText("routine_screen_profile") /*"Profile"*/,
-                const LoginScreen(),
-                isDarkMode),
+            const SizedBox(width: 10),
           ],
         ),
-      ),
-    );
+        body: ValueListenableBuilder<double>(
+          valueListenable: FontSizeNotifier.fontSizeNotifier,
+          builder: (context, fontSize, child) {
+            return Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: isDarkMode
+                      ? [Colors.deepPurple.shade900, Colors.black]
+                      : [Colors.orangeAccent, Colors.pinkAccent],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 4),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text(
+                        "-${TextsInApp.getText("routine_screen_working_techniques")}-", //"Working Techniques",
+                        style: TextStyle(
+                          fontSize: fontSize + 5,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    _buildResponsiveTechniqueGrid(isDarkMode, fontSize),
+                    const SizedBox(height: 15),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text(
+                        "-${TextsInApp.getText("routine_screen_task_handling")}-", //"Task Handling",
+                        style: TextStyle(
+                          fontSize: fontSize + 5,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    _buildResponsiveTaskHandlingGrid(isDarkMode, fontSize),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: RoutineList(
+                        onRoutineUpdated: _updateRoutine,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        bottomNavigationBar: AppDecorations.getAppBottomBar(_buildNavBarIcon,
+            isDarkMode, context, _updateLanguage, _updateRoutine));
   }
 
   Widget _buildNavBarIcon(BuildContext context, IconData icon, String label,
@@ -346,8 +311,7 @@ class RoutineScreenState extends State<RoutineScreen> {
   Widget _buildResponsiveTaskHandlingGrid(bool isDarkMode, double fontSize) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        int crossAxisCount =
-            3; //constraints.maxWidth ~/ 140; // Adjust column count
+        int crossAxisCount = 3;
         return GridView.count(
           crossAxisCount: crossAxisCount > 0 ? crossAxisCount : 1,
           mainAxisSpacing: 10.0,
@@ -385,8 +349,7 @@ class RoutineScreenState extends State<RoutineScreen> {
   Widget _buildResponsiveTechniqueGrid(bool isDarkMode, double fontSize) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        int crossAxisCount =
-            3; //constraints.maxWidth ~/ 140; // Adjust column count
+        int crossAxisCount = 3;
         return GridView.count(
           crossAxisCount: crossAxisCount > 0 ? crossAxisCount : 1,
           mainAxisSpacing: 10.0,
