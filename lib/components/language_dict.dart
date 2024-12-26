@@ -85,6 +85,8 @@ class LanguageDictionary {
       "technique_groups": "Technique Groups",
       "custom_groups": "Custom Groups",
       "delete_group": "Delete Group",
+      "guideline_techniques": "Techniques",
+      "home_page_guideline": "Guide"
     },
     'tr': {
       //Türkçe
@@ -169,6 +171,8 @@ class LanguageDictionary {
       "technique_groups": "Teknik Gruplar",
       "custom_groups": "Özel Gruplar",
       "delete_group": "Grubu Sil",
+      "guideline_techniques": "Teknikler",
+      "home_page_guideline": "Kılavuz"
     },
     'fr': {
       // French
@@ -255,6 +259,8 @@ class LanguageDictionary {
       "technique_groups": "Les Groupes Techniques",
       "custom_groups": "Groupes Personnalisés",
       "delete_group": "Supprimer un groupe",
+      "guideline_techniques": "Les techniques",
+      "home_page_guideline": "Guide"
     },
     'de': {
       // German
@@ -342,7 +348,9 @@ class LanguageDictionary {
       "eat_that_frog_enter_difficulty": "Schwierigkeiten eingeben",
       "technique_groups": "Technische Gruppen",
       "custom_groups": "Benutzerdefinierte Gruppen",
-      "delete_group": "Gruppe löschen"
+      "delete_group": "Gruppe löschen",
+      "guideline_techniques": "Techniken",
+      "home_page_guideline": "Führung"
     },
     'es': {
       // Spanish
@@ -429,6 +437,8 @@ class LanguageDictionary {
       "technique_groups": "Grupos Técnicos",
       "custom_groups": "Grupos personalizados",
       "delete_group": "Borrar grupo",
+      "guideline_techniques": "Técnicas",
+      "home_page_guideline": "Guía"
     },
   };
 }

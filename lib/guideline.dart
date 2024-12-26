@@ -177,7 +177,7 @@ class GuidelineScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Productivity Techniques'),
+        title: Text(TextsInApp.getText("guideline_techniques")),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
@@ -307,7 +307,7 @@ class TechniqueDetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Technique Details'),
+        title: Text(TextsInApp.getText("guideline_techniques")), //'Techniques'
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,

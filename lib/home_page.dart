@@ -113,7 +113,7 @@ class _HomePageState extends State<HomePage>
                     icon: const Icon(Icons.menu_book, size: 26),
                     iconAlignment: IconAlignment.start,
                     label: Text(
-                      "Guideline",
+                      TextsInApp.getText("home_page_guideline"), //"Guideline"
                       style: const TextStyle(color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
