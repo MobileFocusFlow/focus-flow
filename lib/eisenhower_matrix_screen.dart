@@ -253,7 +253,7 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
               valueListenable: FontSizeNotifier.fontSizeNotifier,
               builder: (context, fontSize, child) {
                 return Text(
-                  routine.dateTime.toLocal().toString().split(' ')[0],
+                  "${routine.dateTime.toLocal().toString().split(' ')[0]} ${TextsInApp.getText("at")} ${routine.dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}",
                   style: TextStyle(fontSize: fontSize - 2, color: Colors.grey),
                 );
               },
@@ -380,7 +380,7 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
                         valueListenable: FontSizeNotifier.fontSizeNotifier,
                         builder: (context, fontSize, child) {
                           return Text(
-                            routine.dateTime.toLocal().toString().split(' ')[0],
+                            "${routine.dateTime.toLocal().toString().split(' ')[0]} ${TextsInApp.getText("at")} ${routine.dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}",
                             style: TextStyle(
                               fontSize: fontSize - 2,
                               color: Colors.grey,
