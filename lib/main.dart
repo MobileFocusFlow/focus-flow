@@ -1,11 +1,16 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'login.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Firebase'i başlatıyoruz.
-  runApp(const MyApp());
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]).then((_) {
+    runApp(MyApp());
+  });
 }
 
 class ThemeNotifier {
@@ -14,8 +19,7 @@ class ThemeNotifier {
 }
 
 class FontSizeNotifier {
-  static final ValueNotifier<double> fontSizeNotifier =
-      ValueNotifier<double>(16.0);
+  static ValueNotifier<double> fontSizeNotifier = ValueNotifier<double>(14.0);
 }
 
 class MyApp extends StatelessWidget {

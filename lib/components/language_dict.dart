@@ -26,7 +26,6 @@ class LanguageDictionary {
       "routines": "Routines",
       "add_group": "Add Group",
       "working_technique": "Working Technique",
-      "scheduled": "Scheduled",
       "edit_routine": "Edit Routine",
       'home_page_welcome': 'Welcome to Focus Flow',
       'home_page_goto_routine_screen': 'Go To Routine Screen',
@@ -86,6 +85,8 @@ class LanguageDictionary {
       "technique_groups": "Technique Groups",
       "custom_groups": "Custom Groups",
       "delete_group": "Delete Group",
+      "guideline_techniques": "Techniques",
+      "home_page_guideline": "Guide"
     },
     'tr': {
       //Türkçe
@@ -113,7 +114,6 @@ class LanguageDictionary {
       "routines": "Rutinler",
       "add_group": "Grup Ekle",
       "working_technique": "Çalışma Tekniği",
-      "scheduled": "Planlanmış",
       "edit_routine": "Rutini Düzenle",
       'home_page_welcome': 'Focus Flow\'a Hoşgeldiniz',
       'home_page_goto_routine_screen': 'Rutin Ekranına Git',
@@ -171,6 +171,8 @@ class LanguageDictionary {
       "technique_groups": "Teknik Gruplar",
       "custom_groups": "Özel Gruplar",
       "delete_group": "Grubu Sil",
+      "guideline_techniques": "Teknikler",
+      "home_page_guideline": "Kılavuz"
     },
     'fr': {
       // French
@@ -198,7 +200,6 @@ class LanguageDictionary {
       "routines": "Routines",
       "add_group": "Ajouter un Groupe",
       "working_technique": "Technique de Travail",
-      "scheduled": "Planifié",
       "edit_routine": "Modifier la Routine",
       "home_page_welcome": 'Bienvenue dans Focus Flow',
       "home_page_goto_routine_screen": 'Aller à l’Écran des Routines',
@@ -258,6 +259,8 @@ class LanguageDictionary {
       "technique_groups": "Les Groupes Techniques",
       "custom_groups": "Groupes Personnalisés",
       "delete_group": "Supprimer un groupe",
+      "guideline_techniques": "Les techniques",
+      "home_page_guideline": "Guide"
     },
     'de': {
       // German
@@ -285,7 +288,6 @@ class LanguageDictionary {
       "routines": "Routinen",
       "add_group": "Gruppe Hinzufügen",
       "working_technique": "Arbeitstechnik",
-      "scheduled": "Geplant",
       "edit_routine": "Routine Bearbeiten",
       "home_page_welcome": 'Willkommen bei Focus Flow',
       "home_page_goto_routine_screen": 'Zur Routinen-Seite Gehen',
@@ -346,7 +348,9 @@ class LanguageDictionary {
       "eat_that_frog_enter_difficulty": "Schwierigkeiten eingeben",
       "technique_groups": "Technische Gruppen",
       "custom_groups": "Benutzerdefinierte Gruppen",
-      "delete_group": "Gruppe löschen"
+      "delete_group": "Gruppe löschen",
+      "guideline_techniques": "Techniken",
+      "home_page_guideline": "Führung"
     },
     'es': {
       // Spanish
@@ -374,7 +378,6 @@ class LanguageDictionary {
       "routines": "Rutinas",
       "add_group": "Añadir Grupo",
       "working_technique": "Técnica de Trabajo",
-      "scheduled": "Programado",
       "edit_routine": "Editar Rutina",
       "home_page_welcome": 'Bienvenido a Focus Flow',
       "home_page_goto_routine_screen": 'Ir a la Pantalla de Rutinas',
@@ -434,6 +437,8 @@ class LanguageDictionary {
       "technique_groups": "Grupos Técnicos",
       "custom_groups": "Grupos personalizados",
       "delete_group": "Borrar grupo",
+      "guideline_techniques": "Técnicas",
+      "home_page_guideline": "Guía"
     },
   };
 }

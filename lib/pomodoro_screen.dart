@@ -33,8 +33,8 @@ class PomodoroScreenState extends State<PomodoroScreen> {
   void initState() {
     super.initState();
     _timeRemaining = _workDuration;
-    _motivationalQuote = QuoteManager.getRandomQuote(
-        TextsInApp.getLanguageCode()); // Added for quotes
+    _motivationalQuote =
+        QuoteManager.getRandomQuote(TextsInApp.getLanguageCode());
   }
 
   void _startTimer() {

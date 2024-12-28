@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:focusflow/components/action_button.dart';
 import 'package:focusflow/components/language_select.dart';
+import 'package:focusflow/routine_details_screen.dart';
 import 'package:focusflow/temp_user_db.dart';
 import 'routine_screen.dart';
 
 class TaskBatchingScreen extends StatefulWidget {
-  const TaskBatchingScreen({super.key});
+  final Function(Routine) onRoutineUpdated;
+  const TaskBatchingScreen({super.key, required this.onRoutineUpdated});
 
   @override
   TaskBatchingScreenState createState() => TaskBatchingScreenState();
@@ -262,7 +263,15 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
     return ListTile(
       onTap: () {
         UserDatabase.lastSelectedRoutine = routine;
-        ActionButton.navigateToScene(routine, context);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RoutineDetailsScreen(
+                onRoutinesUpdated: (updatedRoutine) {
+                  widget.onRoutineUpdated(updatedRoutine);
+                },
+              ),
+            ));
       },
       title: Text(
         routine.title,
@@ -272,7 +281,7 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
         ),
       ),
       subtitle: Text(
-        "${TextsInApp.getText("scheduled")}: ${routine.dateTime.toLocal().toString().split(' ')[0]} ${TextsInApp.getText("at")} ${routine.dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}",
+        "${routine.dateTime.toLocal().toString().split(' ')[0]} ${TextsInApp.getText("at")} ${routine.dateTime.toLocal().toString().split(' ')[1].substring(0, 5)}",
         style: const TextStyle(
           fontSize: 14,
           color: Colors.grey,
@@ -284,7 +293,7 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
           if (isDefaultGroup)
             IconButton(
               icon: const Icon(Icons.arrow_forward,
-                  color: Colors.green, size: 30),
+                  color: Colors.green, size: 32),
               onPressed: () {
                 _showAddToGroupDialog(routine);
               },
@@ -364,9 +373,6 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
                     return ListTile(
                       style: ListTileStyle.list,
                       title: Text(groupName),
-                      /*tileColor: isDarkMode
-                          ? Colors.deepPurple.shade900
-                          : Colors.deepOrange.shade600,*/
                       onTap: () {
                         _addRoutineToCustomGroup(groupName, routine);
                         Navigator.pop(context);

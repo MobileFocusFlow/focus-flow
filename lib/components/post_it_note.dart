@@ -35,7 +35,7 @@ class _PostItNoteState extends State<PostItNote> {
 
     return Center(
       child: Container(
-        width: screenWidth * 0.85, // 85% of the screen width
+        width: screenWidth * 0.85,
         height: 280,
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
@@ -56,7 +56,7 @@ class _PostItNoteState extends State<PostItNote> {
               child: SingleChildScrollView(
                 child: TextField(
                   controller: _controller,
-                  maxLines: null, // Allows wrapping of text
+                  maxLines: null,
                   style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     hintText: TextsInApp.getText(

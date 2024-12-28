@@ -1,5 +1,4 @@
 import 'package:focusflow/components/user_preferences.dart';
-
 import 'routine_screen.dart';
 
 class UserDatabase {
