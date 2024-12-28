@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'register.dart';
-import 'temp_user_db.dart';
 import 'home_page.dart';
+import 'firebase_services/firebase_auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,19 +15,26 @@ class LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  void login() {
+  final AuthService _authService = AuthService();
+
+  Future<void> login() async {
     if (_formKey.currentState!.validate()) {
       String email = _emailController.text.trim();
       String password = _passwordController.text.trim();
 
-      if (UserDatabase.login(email, password)) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
-      } else {
+      try {
+        final user =
+            await _authService.signInWithEmailAndPassword(email, password);
+
+        if (user != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        }
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid email or password')),
+          SnackBar(content: Text(e.toString())),
         );
       }
     }

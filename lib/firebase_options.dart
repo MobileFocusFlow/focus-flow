@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -59,4 +56,15 @@ class DefaultFirebaseOptions {
     projectId: 'focus-flow-1cc1a',
     storageBucket: 'focus-flow-1cc1a.firebasestorage.app',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyABJg56bUbMav1TNKnrVj7bC2YVqeloSgE',
+    appId: '1:98744907501:web:15af8af558c5bd71543ee4',
+    messagingSenderId: '98744907501',
+    projectId: 'focus-flow-1cc1a',
+    authDomain: 'focus-flow-1cc1a.firebaseapp.com',
+    storageBucket: 'focus-flow-1cc1a.firebasestorage.app',
+    measurementId: 'G-M2BWEB08Y4',
+  );
+
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'temp_user_db.dart';
+import 'firebase_services/firebase_auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -13,23 +13,28 @@ class RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  void register() {
-    if (_formKey.currentState!.validate()) {
-      UserDatabase.users[UserDatabase.emailIdentifier] =
-          _emailController.text.trim();
-      UserDatabase.users[UserDatabase.passwordIdentifier] =
-          _passwordController.text.trim();
+  final AuthService _authService = AuthService();
 
-      if (UserDatabase.register(
-          UserDatabase.users[UserDatabase.emailIdentifier]!,
-          UserDatabase.users[UserDatabase.passwordIdentifier]!)) {
+  Future<void> register() async {
+    if (_formKey.currentState!.validate()) {
+      String email = _emailController.text.trim();
+      String password = _passwordController.text.trim();
+
+      try {
+        final user =
+            await _authService.registerWithEmailAndPassword(email, password);
+
+        if (user != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content:
+                    Text('Verification email sent. Please verify your email.')),
+          );
+          Navigator.pop(context);
+        }
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registration Successful')),
-        );
-        Navigator.pop(context);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Email already registered')),
+          SnackBar(content: Text(e.toString())),
         );
       }
     }
@@ -69,10 +74,10 @@ class RegisterScreenState extends State<RegisterScreen> {
                 decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
                 validator: (value) {
-                  if (value == null) {
+                  if (value == null || value.isEmpty) {
                     return 'Please enter your password';
                   }
-                  if (value.isEmpty) {
+                  if (value.length < 6) {
                     return 'Password must be at least 6 characters';
                   }
                   return null;

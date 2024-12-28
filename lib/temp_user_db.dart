@@ -101,20 +101,4 @@ class UserDatabase {
           ?.removeWhere((routine) => routine.key == routineKey);
     }
   }
-
-  static bool register(String email, String password) {
-    if (users.containsKey(email)) {
-      return false;
-    }
-    users[email] = password;
-    userPrefs[email] = UserPreferences("English", 16, false);
-    return true;
-  }
-
-  static bool login(String email, String password) {
-    if (users[email] == password) {
-      activeEmail = email;
-    }
-    return users[email] == password;
-  }
 }
