@@ -36,21 +36,40 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Form(
+     
+      appBar: AppBar(title: const Text("Login"),backgroundColor: Colors.redAccent ,),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.orangeAccent, Colors.redAccent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomLeft,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Form(
           key: _formKey,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+             mainAxisAlignment: MainAxisAlignment.center,
+             children: [
+               
               Text("Welcome Back",
-                  style: Theme.of(context).textTheme.headlineMedium),
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white)),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: InputDecoration(labelText: 'Email',
+                prefixIcon:Icon(Icons.email), 
+                labelStyle: TextStyle(color: Colors.black),
+                border: OutlineInputBorder(
+                  borderRadius:BorderRadius.circular(50.0),
+                ),
+                filled:true,
+                fillColor: Colors.white.withOpacity(0.7),
+                ),
                 keyboardType: TextInputType.emailAddress,
+                style: TextStyle(color: Colors.black),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
@@ -64,8 +83,16 @@ class LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
+                decoration: InputDecoration(labelText: 'Password', 
+                prefixIcon:Icon(Icons.lock),
+                border: OutlineInputBorder(
+                  borderRadius:BorderRadius.circular(50.0),
+                ),
+                filled:true,
+                fillColor: Colors.white.withOpacity(0.7),
+                labelStyle: TextStyle(color: Colors.black)),
                 obscureText: true,
+                style: TextStyle(color: Colors.black),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your password';
@@ -74,9 +101,29 @@ class LoginScreenState extends State<LoginScreen> {
                 },
               ),
               const SizedBox(height: 24),
-              ElevatedButton(onPressed: login, child: const Text('Login')),
+              ElevatedButton(
+                style:ElevatedButton.styleFrom(
+                  padding:const EdgeInsets.symmetric(horizontal: 50,vertical: 15),
+                  shape:RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  backgroundColor: Colors.lightGreen,
+                  foregroundColor: Colors.black,
+
+                ),
+                onPressed: login,
+                 child: const Text('Login')
+                ),
               const SizedBox(height: 16),
               OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  padding:const EdgeInsets.symmetric(horizontal: 50,vertical: 15),
+                  shape:RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  backgroundColor: Colors.lightGreen,
+                  foregroundColor: Colors.blue,
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -84,11 +131,12 @@ class LoginScreenState extends State<LoginScreen> {
                         builder: (context) => const RegisterScreen()),
                   );
                 },
-                child: const Text("Don't have an account? Register"),
+                child: const Text("Don't have an account? Register", style: TextStyle(color: Colors.black)),
               ),
             ],
           ),
         ),
+      ),
       ),
     );
   }
