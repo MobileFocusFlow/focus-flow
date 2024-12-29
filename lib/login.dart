@@ -14,6 +14,7 @@ class LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isPasswordVisible = false;
 
   void login() {
     if (_formKey.currentState!.validate()) {
@@ -37,15 +38,30 @@ class LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
      
-      appBar: AppBar(title: const Text("Login"),backgroundColor: Colors.redAccent ,),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(56.0),
+        child: AppBar(
+          title: const Text("Login"),
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.deepOrangeAccent, Colors.orange],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+        ),
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.orangeAccent, Colors.redAccent],
+            colors: [Colors.orangeAccent, Colors.pinkAccent],
             begin: Alignment.topLeft,
             end: Alignment.bottomLeft,
           ),
         ),
+        
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Form(
@@ -53,7 +69,17 @@ class LoginScreenState extends State<LoginScreen> {
           child: Column(
              mainAxisAlignment: MainAxisAlignment.center,
              children: [
-               
+               ColorFiltered(
+                    colorFilter: ColorFilter.mode(
+                      Colors.orange.withOpacity(0.34),
+                      BlendMode.srcATop,
+                    ),
+                    child: Image.asset(
+                      "lib/assets/images/logo.png",
+                      height: 190,
+                      width: 190,
+                    ),
+                  ),
               Text("Welcome Back",
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white)),
               const SizedBox(height: 16),
@@ -83,15 +109,27 @@ class LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Password', 
-                prefixIcon:Icon(Icons.lock),
-                border: OutlineInputBorder(
-                  borderRadius:BorderRadius.circular(50.0),
+                decoration: InputDecoration(
+                  labelText: 'Password', 
+                  prefixIcon: Icon(Icons.lock),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(50.0),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.7),
+                  labelStyle: TextStyle(color: Colors.black),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                  ),
                 ),
-                filled:true,
-                fillColor: Colors.white.withOpacity(0.7),
-                labelStyle: TextStyle(color: Colors.black)),
-                obscureText: true,
+                obscureText: !_isPasswordVisible,
                 style: TextStyle(color: Colors.black),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -131,7 +169,7 @@ class LoginScreenState extends State<LoginScreen> {
                         builder: (context) => const RegisterScreen()),
                   );
                 },
-                child: const Text("Don't have an account? Register", style: TextStyle(color: Colors.black)),
+                child: const Text("Don't have an account? Register Now.", style: TextStyle(color: Colors.black)),
               ),
             ],
           ),
