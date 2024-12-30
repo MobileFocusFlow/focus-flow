@@ -72,12 +72,20 @@ class TempUserDB {
     );
   }
 
+  static void updateRoutine(Routine updatedRoutine, String email) {
+    _firestoreService.updateRoutineByKey(
+      'users/$email/routines',
+      updatedRoutine.key,
+      updatedRoutine.toJson(),
+    );
+  }
+
   // Rutinleri geçici depodan sil
   static void removeRoutine(String routineKey, String email) {
     routines.removeWhere((routine) => routine.key == routineKey);
 
     // Firestore'dan sil
-    _firestoreService.deleteData('users/$email/routines', routineKey);
+    _firestoreService.deleteRoutineByKey('users/$email/routines', routineKey);
   }
 
   // Firestore'dan rutinleri çek ve geçici depoya yükle
@@ -112,7 +120,7 @@ class TempUserDB {
     }
 
     // Firestore'dan grup sil
-    //_firestoreService.deleteData('users/$email/groups', docId: groupName);
+    _firestoreService.deleteData('users/$email/groups', groupName);
   }
 
   // Rutinleri bir gruba ekle

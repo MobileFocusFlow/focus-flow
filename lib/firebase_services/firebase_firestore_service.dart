@@ -22,12 +22,49 @@ class FirestoreService {
     }
   }
 
+  Future<void> updateRoutineByKey(String collectionPath, String key,
+      Map<String, dynamic> updatedData) async {
+    try {
+      // Belgeyi `key` alanına göre sorgula
+      QuerySnapshot snapshot = await _firestore
+          .collection(collectionPath)
+          .where('key', isEqualTo: key)
+          .get();
+
+      // Sorgu sonucundaki belgeler üzerinde güncelleme yap
+      for (var doc in snapshot.docs) {
+        await doc.reference.update(updatedData);
+        print("Updated document with key: $key and ID: ${doc.id}");
+      }
+    } catch (e) {
+      print("Error updating document with key $key: $e");
+    }
+  }
+
   // Veri silme
   Future<void> deleteData(String collectionPath, String docId) async {
     try {
       await _firestore.collection(collectionPath).doc(docId).delete();
     } catch (e) {
       print("Firestore Delete Error: $e");
+    }
+  }
+
+  Future<void> deleteRoutineByKey(String collectionPath, String key) async {
+    try {
+      // Belgeyi `key` alanına göre sorgula
+      QuerySnapshot snapshot = await _firestore
+          .collection(collectionPath)
+          .where('key', isEqualTo: key)
+          .get();
+
+      // Belgeler arasında gezin ve sil
+      for (var doc in snapshot.docs) {
+        await doc.reference.delete();
+        print("Deleted document with key: $key and ID: ${doc.id}");
+      }
+    } catch (e) {
+      print("Error deleting document with key $key: $e");
     }
   }
 

@@ -14,7 +14,6 @@ class AuthService {
       // Kullanıcı başarıyla kaydedildiğinde aktif e-posta adresini UserDatabase'e atıyoruz
       if (result.user != null) {
         UserDatabase.activeEmail = result.user!.email ?? '';
-        await UserDatabase.loadRoutines();
       }
       return result.user;
     } on FirebaseAuthException catch (e) {
@@ -38,7 +37,9 @@ class AuthService {
       // Kullanıcı giriş yaptıktan sonra aktif e-posta adresini UserDatabase'e atıyoruz
       if (result.user != null) {
         UserDatabase.activeEmail = result.user!.email ?? '';
+        await UserDatabase.loadRoutines();
       }
+
       return result.user;
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
