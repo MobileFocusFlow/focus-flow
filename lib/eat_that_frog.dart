@@ -30,6 +30,7 @@ class EatThatFrogScreenState extends State<EatThatFrogScreen> {
     setState(() {
       routine.priority = newDifficulty;
       _sortedRoutines.sort((a, b) => b.priority.compareTo(a.priority));
+      UserDatabase.updateValue(routine);
     });
   }
 

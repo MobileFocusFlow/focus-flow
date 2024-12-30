@@ -28,6 +28,11 @@ class UserDatabase {
     TempUserDB.addRoutine(newRoutine, activeEmail);
   }
 
+  //PostitNote güncelleme
+  static void updateValue(Routine updatedRoutine) {
+    TempUserDB.updateValue(updatedRoutine, activeEmail);
+  }
+
   // Rutin sil
   static void removeRoutine(String routineKey) {
     TempUserDB.removeRoutine(routineKey, activeEmail);
@@ -72,8 +77,25 @@ class TempUserDB {
     );
   }
 
+// Güncellemeler
   static void updateRoutine(Routine updatedRoutine, String email) {
     _firestoreService.updateRoutineByKey(
+      'users/$email/routines',
+      updatedRoutine.key,
+      updatedRoutine.toJson(),
+    );
+  }
+
+  static void updateValue(Routine updatedRoutine, String email) async {
+    // Yerel veriyi güncelle
+    final index =
+        routines.indexWhere((routine) => routine.key == updatedRoutine.key);
+    if (index != -1) {
+      routines[index] = updatedRoutine;
+    }
+
+    // Firestore'daki veriyi güncelle
+    await _firestoreService.updateRoutineByKey(
       'users/$email/routines',
       updatedRoutine.key,
       updatedRoutine.toJson(),

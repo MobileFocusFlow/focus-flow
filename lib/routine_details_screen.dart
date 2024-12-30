@@ -54,6 +54,7 @@ class _RoutineDetailsScreenState extends State<RoutineDetailsScreen> {
   void _savePostItText(String text) {
     setState(() {
       UserDatabase.lastSelectedRoutine.postItNote = text;
+      UserDatabase.updateValue(UserDatabase.lastSelectedRoutine);
     });
   }
 

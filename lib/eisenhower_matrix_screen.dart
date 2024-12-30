@@ -59,6 +59,7 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
       }
     }
     technicalGroups = _groupRoutinesByTechnique(allRoutines);
+
     setState(() {});
   }
 
@@ -98,6 +99,7 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
                 : 0;
       }
     });
+    UserDatabase.updateValue(routine);
   }
 
   void _moveRoutineBackToTechniqueGroup(String group, Routine routine) {
@@ -114,6 +116,7 @@ class EisenhowerMatrixScreenState extends State<EisenhowerMatrixScreen> {
         technicalGroups[group]!.add(routine);
       }
     });
+    UserDatabase.updateValue(routine);
   }
 
   @override
