@@ -69,19 +69,20 @@ class Routine {
   int priority;
   int isImportant;
   int isUrgent;
+  String customGroup;
 
   Routine(
-    this.key,
-    this.title,
-    this.dateTime,
-    this.workingTechnique,
-    this.workDuration,
-    this.breakDuration,
-    this.postItNote,
-    this.priority,
-    this.isImportant,
-    this.isUrgent,
-  );
+      this.key,
+      this.title,
+      this.dateTime,
+      this.workingTechnique,
+      this.workDuration,
+      this.breakDuration,
+      this.postItNote,
+      this.priority,
+      this.isImportant,
+      this.isUrgent,
+      this.customGroup);
 
   Map<String, dynamic> toJson() {
     return {
@@ -95,22 +96,23 @@ class Routine {
       'priority': priority,
       'isImportant': isImportant,
       'isUrgent': isUrgent,
+      'customGroup': customGroup
     };
   }
 
   factory Routine.fromJson(Map<String, dynamic> json) {
     return Routine(
-      json['key'],
-      json['title'],
-      DateTime.parse(json['dateTime']),
-      json['workingTechnique'],
-      json['workDuration'],
-      json['breakDuration'],
-      json['postItNote'],
-      json['priority'],
-      json['isImportant'],
-      json['isUrgent'],
-    );
+        json['key'],
+        json['title'],
+        DateTime.parse(json['dateTime']),
+        json['workingTechnique'],
+        json['workDuration'],
+        json['breakDuration'],
+        json['postItNote'],
+        json['priority'],
+        json['isImportant'],
+        json['isUrgent'],
+        json['customGroup']);
   }
 }
 
@@ -123,29 +125,31 @@ class RoutineScreen extends StatefulWidget {
 
 class RoutineScreenState extends State<RoutineScreen> {
   void _addRoutine(
-    String key,
-    String title,
-    DateTime dateTime,
-    String workingTechnique,
-    int workingDuration,
-    int? breakDuration,
-    String postItNote,
-    int priority,
-    int isImportant,
-    int isUrgent,
-  ) {
+      String key,
+      String title,
+      DateTime dateTime,
+      String workingTechnique,
+      int workingDuration,
+      int? breakDuration,
+      String postItNote,
+      int priority,
+      int isImportant,
+      int isUrgent,
+      String customGroup) {
     final routine = Routine(
-      key,
-      title,
-      dateTime,
-      workingTechnique,
-      workingDuration,
-      workingTechnique == Routine.pomodoroIdentifier ? (breakDuration ?? 0) : 5,
-      postItNote,
-      priority,
-      isImportant,
-      isUrgent,
-    );
+        key,
+        title,
+        dateTime,
+        workingTechnique,
+        workingDuration,
+        workingTechnique == Routine.pomodoroIdentifier
+            ? (breakDuration ?? 0)
+            : 5,
+        postItNote,
+        priority,
+        isImportant,
+        isUrgent,
+        customGroup);
 
     setState(() {
       UserDatabase.getRoutines().add(routine);

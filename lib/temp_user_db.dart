@@ -7,7 +7,7 @@ class UserDatabase {
   static String activeEmail = "";
   static Routine lastSelectedRoutine = TempUserDB.getRoutines().isNotEmpty
       ? TempUserDB.getRoutines().first
-      : Routine("", "", DateTime.now(), "", 0, 0, "", 0, 0, 0);
+      : Routine("", "", DateTime.now(), "", 0, 0, "", 0, 0, 0, "");
 
   static final Map<String, String> users = {};
   static Map<String, List<Routine>> userRoutines = {};

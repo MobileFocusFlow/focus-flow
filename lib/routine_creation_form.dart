@@ -6,9 +6,8 @@ import 'routine_screen.dart';
 
 class RoutineCreationForm extends StatefulWidget {
   final String workingTechnique;
-  final Function(
-          String, String, DateTime, String, int, int?, String, int, int, int)
-      onRoutineCreated;
+  final Function(String, String, DateTime, String, int, int?, String, int, int,
+      int, String) onRoutineCreated;
 
   const RoutineCreationForm({
     super.key,
@@ -31,6 +30,7 @@ class _RoutineCreationFormState extends State<RoutineCreationForm> {
   final int _priority = 0;
   final int _isImportant = -1;
   final int _isUrgent = -1;
+  final String _customGroup = "";
 
   final _workDurationController = TextEditingController();
   final _breakDurationController = TextEditingController();
@@ -289,7 +289,8 @@ class _RoutineCreationFormState extends State<RoutineCreationForm> {
           _postItNote,
           _priority,
           _isImportant,
-          _isUrgent);
+          _isUrgent,
+          _customGroup);
 
       setState(() {
         Routine newRoutine = Routine(
@@ -302,7 +303,8 @@ class _RoutineCreationFormState extends State<RoutineCreationForm> {
             _postItNote,
             _priority,
             _isImportant,
-            _isUrgent);
+            _isUrgent,
+            _customGroup);
         UserDatabase.addRoutine(newRoutine);
       });
 
