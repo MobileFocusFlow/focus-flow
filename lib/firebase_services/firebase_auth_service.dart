@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:focusflow/temp_user_db.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -10,6 +11,11 @@ class AuthService {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       await result.user?.sendEmailVerification();
+      // Kullanıcı başarıyla kaydedildiğinde aktif e-posta adresini UserDatabase'e atıyoruz
+      if (result.user != null) {
+        UserDatabase.activeEmail = result.user!.email ?? '';
+        await UserDatabase.loadRoutines();
+      }
       return result.user;
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
@@ -29,7 +35,10 @@ class AuthService {
         await signOut();
         throw Exception("Please verify your email address.");
       }
-
+      // Kullanıcı giriş yaptıktan sonra aktif e-posta adresini UserDatabase'e atıyoruz
+      if (result.user != null) {
+        UserDatabase.activeEmail = result.user!.email ?? '';
+      }
       return result.user;
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
@@ -60,6 +69,8 @@ class AuthService {
   Future<void> signOut() async {
     try {
       await _auth.signOut();
+      // Çıkış yapıldığında aktif e-posta adresini boşaltıyoruz
+      UserDatabase.activeEmail = '';
     } catch (e) {
       throw Exception("Error signing out: ${e.toString()}");
     }

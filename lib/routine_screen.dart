@@ -82,6 +82,36 @@ class Routine {
     this.isImportant,
     this.isUrgent,
   );
+
+  Map<String, dynamic> toJson() {
+    return {
+      'key': key,
+      'title': title,
+      'dateTime': dateTime.toIso8601String(),
+      'workingTechnique': workingTechnique,
+      'workDuration': workDuration,
+      'breakDuration': breakDuration,
+      'postItNote': postItNote,
+      'priority': priority,
+      'isImportant': isImportant,
+      'isUrgent': isUrgent,
+    };
+  }
+
+  factory Routine.fromJson(Map<String, dynamic> json) {
+    return Routine(
+      json['key'],
+      json['title'],
+      DateTime.parse(json['dateTime']),
+      json['workingTechnique'],
+      json['workDuration'],
+      json['breakDuration'],
+      json['postItNote'],
+      json['priority'],
+      json['isImportant'],
+      json['isUrgent'],
+    );
+  }
 }
 
 class RoutineScreen extends StatefulWidget {
