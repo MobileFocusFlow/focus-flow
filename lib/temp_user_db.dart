@@ -63,7 +63,7 @@ class TempUserDB {
 
   // Rutinleri geçici depoya ekle
   static void addRoutine(Routine routine, String email) {
-    routines.add(routine);
+    //routines.add(routine);
 
     // Firestore'a ekle
     _firestoreService.addData(
