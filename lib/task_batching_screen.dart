@@ -6,6 +6,7 @@ import 'routine_screen.dart';
 
 class TaskBatchingScreen extends StatefulWidget {
   final Function(Routine) onRoutineUpdated;
+
   const TaskBatchingScreen({super.key, required this.onRoutineUpdated});
 
   @override
@@ -21,92 +22,91 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
   void initState() {
     super.initState();
     _loadRoutines();
-    customGroups = UserDatabase.getCustomGroups();
   }
 
   void _loadRoutines() {
     allRoutines = UserDatabase.getRoutines();
     groupedRoutines = _groupRoutinesByTechnique(allRoutines);
+    customGroups = _groupRoutinesByCustomGroup(allRoutines);
   }
 
   Map<String, List<Routine>> _groupRoutinesByTechnique(List<Routine> routines) {
     Map<String, List<Routine>> techniqueGroups = {};
 
     for (var routine in routines) {
+      if (routine.customGroup.isNotEmpty) continue;
+
       if (!techniqueGroups.containsKey(routine.workingTechnique)) {
         techniqueGroups[routine.workingTechnique] = [];
       }
-      techniqueGroups[routine.workingTechnique]?.add(routine);
+      techniqueGroups[routine.workingTechnique]!.add(routine);
     }
-
-    Map<String, List<Routine>> customGroups = UserDatabase.getCustomGroups();
-
-    Set<Routine> customRoutinesSet = {};
-    customGroups.forEach((key, group) {
-      customRoutinesSet.addAll(group);
-    });
-
-    techniqueGroups.forEach((key, group) {
-      group.removeWhere((routine) => customRoutinesSet.contains(routine));
-    });
 
     return techniqueGroups;
   }
 
+  Map<String, List<Routine>> _groupRoutinesByCustomGroup(
+      List<Routine> routines) {
+    Map<String, List<Routine>> customGroupMap = {};
+
+    for (var routine in routines) {
+      if (routine.customGroup.isNotEmpty) {
+        customGroupMap.putIfAbsent(routine.customGroup, () => []);
+        customGroupMap[routine.customGroup]!.add(routine);
+      }
+    }
+
+    return customGroupMap;
+  }
+
   void _addCustomGroup(String groupName) {
     setState(() {
-      UserDatabase.addCustomGroup(groupName);
-      customGroups = UserDatabase.getCustomGroups();
+      customGroups[groupName] = [];
     });
   }
 
   void _addRoutineToCustomGroup(String groupName, Routine routine) {
     setState(() {
-      UserDatabase.addRoutineToCustomGroup(groupName, routine);
-      _removeRoutineFromDefaultGroup(routine.key);
-      customGroups = UserDatabase.getCustomGroups();
-    });
-  }
-
-  void _restoreRoutine(Routine routine) {
-    setState(() {
-      if (!groupedRoutines.containsKey(routine.workingTechnique)) {
-        groupedRoutines[routine.workingTechnique] = [];
+      if (routine.customGroup.isNotEmpty) {
+        customGroups[routine.customGroup]?.remove(routine);
+        if (customGroups[routine.customGroup]?.isEmpty == true) {
+          customGroups.remove(routine.customGroup);
+        }
       }
-      groupedRoutines[routine.workingTechnique]?.add(routine);
+
+      routine.customGroup = groupName;
+      customGroups.putIfAbsent(groupName, () => []);
+      customGroups[groupName]!.add(routine);
+
+      _removeRoutineFromDefaultGroup(routine.key);
     });
+    // Save to database
   }
 
   void _removeRoutineFromCustomGroup(String groupName, String routineKey) {
     setState(() {
-      UserDatabase.removeRoutineFromCustomGroup(groupName, routineKey);
-      customGroups = UserDatabase.getCustomGroups();
+      final routine = customGroups[groupName]!
+          .firstWhere((routine) => routine.key == routineKey);
+      routine.customGroup = "";
+      customGroups[groupName]!
+          .removeWhere((routine) => routine.key == routineKey);
+
+      if (customGroups[groupName]!.isEmpty) {
+        customGroups.remove(groupName);
+      }
+
+      if (!groupedRoutines.containsKey(routine.workingTechnique)) {
+        groupedRoutines[routine.workingTechnique] = [];
+      }
+      groupedRoutines[routine.workingTechnique]!.add(routine);
     });
+    // Save to database
   }
 
   void _removeRoutineFromDefaultGroup(String routineKey) {
-    setState(() {
-      for (var routines in groupedRoutines.values) {
-        routines.removeWhere((routine) => routine.key == routineKey);
-      }
-    });
-  }
-
-  void _deleteCustomGroup(String groupName) {
-    setState(() {
-      UserDatabase.deleteCustomGroup(groupName);
-      customGroups = UserDatabase.getCustomGroups();
-    });
-  }
-
-  void _deleteRoutine(String routineKey) {
-    setState(() {
-      UserDatabase.removeRoutine(routineKey);
-      _loadRoutines();
-      for (var group in customGroups.values) {
-        group.removeWhere((routine) => routine.key == routineKey);
-      }
-    });
+    for (var routines in groupedRoutines.values) {
+      routines.removeWhere((routine) => routine.key == routineKey);
+    }
   }
 
   @override
@@ -134,27 +134,17 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
             Expanded(
               child: ListView(
                 children: [
-                  _buildGroupSectionTitle(TextsInApp.getText(
-                      "technique_groups")), //"Technique Groups"
+                  _buildGroupSectionTitle(
+                      TextsInApp.getText("technique_groups")),
                   ..._buildDefaultGroups(),
                   const SizedBox(height: 20),
-                  _buildGroupSectionTitle(
-                      TextsInApp.getText("custom_groups")), //"Custom Groups"
+                  _buildGroupSectionTitle(TextsInApp.getText("custom_groups")),
                   ..._buildCustomGroups(),
                 ],
               ),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddGroupDialog(),
-        icon: const Icon(Icons.group_add),
-        label: Text(
-          TextsInApp.getText("add_group") /*"Add Group"*/,
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.deepPurpleAccent,
       ),
     );
   }
@@ -186,8 +176,7 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
 
       return _buildStylishCard(
         title: technique,
-        subtitle:
-            "${routines.length} ${TextsInApp.getText("routines")}", // Routines
+        subtitle: "${routines.length} ${TextsInApp.getText("routines")}",
         leadingIcon: Routine.getTechniqueIcon(technique),
         leadingIconColor: Routine.getTechniqueColor(technique, false),
         children: routines.map((routine) {
@@ -204,28 +193,12 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
 
       return _buildStylishCard(
         title: groupName,
-        subtitle:
-            "${routines.length} ${TextsInApp.getText("routines")}", // Routines
+        subtitle: "${routines.length} ${TextsInApp.getText("routines")}",
         leadingIcon: Icons.folder,
         leadingIconColor: Colors.orange,
-        children: [
-          ...routines.map((routine) {
-            return _buildRoutineTile(routine, groupName: groupName);
-          }),
-          ListTile(
-            leading: const Icon(Icons.delete, color: Colors.red),
-            title: Text(
-              TextsInApp.getText("delete_group"), //"Delete Group",
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
-            ),
-            onTap: () {
-              for (var r in UserDatabase.getCustomGroups()[groupName]!) {
-                _restoreRoutine(r);
-              }
-              _deleteCustomGroup(groupName);
-            },
-          ),
-        ],
+        children: routines.map((routine) {
+          return _buildRoutineTile(routine, groupName: groupName);
+        }).toList(),
       );
     }).toList();
   }
@@ -298,62 +271,15 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
                 _showAddToGroupDialog(routine);
               },
             ),
-          IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
-            onPressed: () {
-              if (isDefaultGroup) {
-                _deleteRoutine(routine.key);
-              } else if (groupName != null) {
+          if (!isDefaultGroup && groupName != null)
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
                 _removeRoutineFromCustomGroup(groupName, routine.key);
-                _restoreRoutine(routine);
-              }
-            },
-          ),
+              },
+            ),
         ],
       ),
-    );
-  }
-
-  void _showAddGroupDialog() {
-    final controller = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(TextsInApp.getText("task_batching_add_custom_group")),
-          /*"Add Custom Group"*/
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              hintText: TextsInApp.getText(
-                  "task_batching_hint_group_name") /*"Enter group name"*/,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(TextsInApp.getText("cancel") /*"Cancel"*/),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final groupName = controller.text.trim();
-                if (groupName.isNotEmpty) {
-                  _addCustomGroup(groupName);
-                }
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurpleAccent,
-              ),
-              child: Text(
-                TextsInApp.getText("add") /*"Add"*/,
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 
@@ -362,28 +288,76 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(TextsInApp.getText(
-              "task_batching_add_to_custom_group") /*"Add to Custom Group"*/),
-          content: customGroups.isEmpty
-              ? Text(TextsInApp.getText(
-                  "task_batching_no_custom_group_available") /*"No custom groups available."*/)
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: customGroups.keys.map((groupName) {
-                    return ListTile(
-                      style: ListTileStyle.list,
-                      title: Text(groupName),
-                      onTap: () {
-                        _addRoutineToCustomGroup(groupName, routine);
-                        Navigator.pop(context);
-                      },
-                    );
-                  }).toList(),
-                ),
+          title: Text(TextsInApp.getText("task_batching_add_to_custom_group")),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (customGroups.isNotEmpty)
+                ...customGroups.keys.map((groupName) {
+                  return ListTile(
+                    title: Text(groupName),
+                    onTap: () {
+                      _addRoutineToCustomGroup(groupName, routine);
+                      Navigator.pop(context);
+                    },
+                  );
+                }),
+              ListTile(
+                leading: Icon(Icons.add, color: Colors.deepPurpleAccent),
+                title:
+                    Text(TextsInApp.getText("task_batching_create_new_group")),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showCreateGroupDialog(routine);
+                },
+              ),
+            ],
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(TextsInApp.getText("cancel") /*"Cancel"*/),
+              child: Text(TextsInApp.getText("cancel")),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showCreateGroupDialog(Routine routine) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(TextsInApp.getText("task_batching_add_custom_group")),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: TextsInApp.getText("task_batching_hint_group_name"),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(TextsInApp.getText("cancel")),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final groupName = controller.text.trim();
+                if (groupName.isNotEmpty) {
+                  _addCustomGroup(groupName);
+                  _addRoutineToCustomGroup(groupName, routine);
+                }
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurpleAccent,
+              ),
+              child: Text(
+                TextsInApp.getText("add"),
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         );
