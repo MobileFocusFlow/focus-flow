@@ -61,6 +61,7 @@ class LanguageDictionary {
       "task_batching_hint_group_name": "Enter group name",
       "task_batching_add_to_custom_group": "Add to Custom Group",
       "task_batching_no_custom_group_available": "No custom groups available.",
+      "task_batching_create_new_group": "Create new custom group.",
       "time_block_complete": "Time Block Complete!",
       "time_block_complete_message":
           "You've successfully completed this time block.",
@@ -149,6 +150,7 @@ class LanguageDictionary {
       "task_batching_hint_group_name": "Grup adını girin",
       "task_batching_add_to_custom_group": "Özel Gruba Ekle",
       "task_batching_no_custom_group_available": "Uygun özel grup bulunumadı.",
+      "task_batching_create_new_group": "Yeni özel grup oluştur",
       "time_block_complete": "Zaman Bloklama Tamamlandı!",
       "time_block_complete_message": "Bu zaman bloğunu başarıyla tamamladın.",
       "pomodoro_complete": "Pomodoro Tamamlandı!",
@@ -236,6 +238,7 @@ class LanguageDictionary {
       "task_batching_add_to_custom_group": "Ajouter au Groupe Personnalisé",
       "task_batching_no_custom_group_available":
           "Aucun groupe personnalisé disponible.",
+      "task_batching_create_new_group": "Créer un nouveau groupe personnalisé",
       "time_block_complete": "Bloc de Temps Terminé !",
       "time_block_complete_message":
           "Vous avez réussi à terminer ce bloc de temps.",
@@ -325,6 +328,8 @@ class LanguageDictionary {
           "Zur Benutzerdefinierten Gruppe Hinzufügen",
       "task_batching_no_custom_group_available":
           "Keine Benutzerdefinierten Gruppen Verfügbar.",
+      "task_batching_create_new_group":
+          "Neue benutzerdefinierte Gruppe erstellen",
       "time_block_complete": "Zeitblock Abgeschlossen!",
       "time_block_complete_message":
           "Sie haben diesen Zeitblock erfolgreich abgeschlossen.",
@@ -414,6 +419,7 @@ class LanguageDictionary {
       "task_batching_add_to_custom_group": "Añadir al Grupo Personalizado",
       "task_batching_no_custom_group_available":
           "No hay grupos personalizados disponibles.",
+      "task_batching_create_new_group": "Crear nuevo grupo personalizado",
       "time_block_complete": "¡Bloque de Tiempo Completado!",
       "time_block_complete_message":
           "Has completado con éxito este bloque de tiempo.",
