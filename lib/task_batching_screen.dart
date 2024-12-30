@@ -41,7 +41,6 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
       }
       techniqueGroups[routine.workingTechnique]!.add(routine);
     }
-
     return techniqueGroups;
   }
 
@@ -80,7 +79,7 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
 
       _removeRoutineFromDefaultGroup(routine.key);
     });
-    // Save to database
+    UserDatabase.updateValue(routine);
   }
 
   void _removeRoutineFromCustomGroup(String groupName, String routineKey) {
@@ -99,8 +98,8 @@ class TaskBatchingScreenState extends State<TaskBatchingScreen> {
         groupedRoutines[routine.workingTechnique] = [];
       }
       groupedRoutines[routine.workingTechnique]!.add(routine);
+      UserDatabase.updateValue(routine);
     });
-    // Save to database
   }
 
   void _removeRoutineFromDefaultGroup(String routineKey) {
