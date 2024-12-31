@@ -154,15 +154,39 @@ class RegisterScreenState extends State<RegisterScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your password';
                   }
-                  if (value.length < 6) {
-                    return 'Password must be at least 6 characters';
+                  if (value.length < 8) {
+                    return 'Password must be at least 8 characters';
                   }
+                  if (!RegExp(r'[A-Z]').hasMatch(value)) {
+                      return 'Password must contain at least one uppercase letter';
+                    }
+                    if (!RegExp(r'[a-z]').hasMatch(value)) {
+                      return 'Password must contain at least one lowercase letter';
+                    }
+                    if (!RegExp(r'[0-9]').hasMatch(value)) {
+                      return 'Password must contain at least one digit';
+                    }
                   return null;
                 },
               ),
+               const SizedBox(height: 16),
+                _buildCriteriaRow('At least 8 characters', hasMinLength),
+            _buildCriteriaRow('At least 1 uppercase letter', hasUppercase),
+            _buildCriteriaRow('At least 1 lowercase letter', hasLowercase),
+            _buildCriteriaRow('At least 1 number', hasDigits),
               const SizedBox(height: 24),
               ElevatedButton(
-                  onPressed: register, child: const Text('Register')),
+                 style: OutlinedButton.styleFrom(
+                  padding:const EdgeInsets.symmetric(horizontal: 50,vertical: 15),
+                  shape:RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  backgroundColor: Colors.lightGreen,
+                  foregroundColor: Colors.blue,
+                ),
+                  onPressed: register, child: const Text('Register',style: TextStyle(color: Colors.black),
+                  ),
+              ),
             ],
           ),
         ),
